@@ -280,6 +280,11 @@ function initializeNewGameState() {
 function startGameFlow() {
     uiManager.activateMainMenuLights(false);
     game.setGameActive(true);
+
+    if (game.slotGameManager) { // Ensure SlotGameManager instance exists
+        game.slotGameManager.stop(); // Explicitly stop the slot game
+    }
+
     uiManager.showScreen(uiManager.gameScreen);
     uiManager.setPhoneUIState('home');
     uiManager.updateHUD();
