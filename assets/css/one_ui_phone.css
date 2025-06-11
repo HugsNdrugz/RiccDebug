@@ -1,0 +1,413 @@
+/* PHONE CONTAINER & STATES */
+.phone-wrapper { /* This is the main phone container (#rikk-phone-ui) */
+    position: relative;
+    width: 100%;
+    max-width: var(--phone-max-width);
+    height: var(--phone-max-height);
+    background: #111; /* Dark background for the phone body */
+    border-radius: var(--phone-border-radius); /* Rounded corners for the phone device */
+    display: flex; /* Make it a flex container for its internal screen */
+    overflow: hidden; /* Hide anything that overflows the phone boundaries */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), 0 0 0 4px rgba(50, 50, 50, 0.8); /* Aesthetic shadow and border */
+    border: 2px solid #000; /* Inner border for depth */
+    /* Transitions for sliding the phone in/out or changing opacity */
+    transition: transform var(--transition-phone-slide), opacity var(--transition-duration-medium) var(--transition-easing);
+    z-index: 50; /* Z-index to layer it correctly in the game scene */
+    
+    /* ADDED: Ensure internal screen is centered if it doesn't fill 100% */
+    justify-content: center;
+    align-items: center;
+
+    /* Theme classes applied by UIManager.js */
+    &.theme-default {
+        --phone-bg-color: #111;
+        --phone-on-bg-color: #e0e0e0;
+    }
+    &.theme-dark {
+        --phone-bg-color: #000;
+        --phone-on-bg-color: #e0e0e0;
+    }
+    &.theme-light {
+        --phone-bg-color: #f0f0f0;
+        --phone-on-bg-color: #111;
+    }
+}
+
+/* Class applied when a modal is open, to hide the phone */
+.phone-wrapper.phone-hidden-by-modal {
+    display: none !important; /* Hides the phone completely */
+}
+
+/* Phone states for animation/visibility */
+.phone-wrapper.is-offscreen {
+    transform: translateY(120%);
+    opacity: 0;
+}
+
+.phone-wrapper.chatting-game,
+.phone-wrapper.home-screen-active,
+.phone-wrapper.app-menu-game {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+/* The actual screen area within the phone body */
+.phone-screen-area {
+    /* FIX: Removed 'class="screen"' from HTML. This element should always be flex and visible once the phone-wrapper is visible. */
+    width: calc(100% - 12px); /* Leaves a small border around the screen */
+    height: calc(100% - 12px);
+    background: #000; /* Default screen background */
+    position: relative;
+    overflow: hidden; /* Ensures content doesn't spill out */
+    border-radius: var(--phone-screen-inset-radius); /* Matches phone body curvature */
+    margin: 6px; /* Creates the inset effect */
+    transition: filter 0.3s ease-in-out, opacity 0.3s ease-in-out;
+    
+    /* ADDED: Make it a flex container and allow it to fill available space */
+    display: flex;
+    flex-direction: column; /* Stack children vertically (status bar, content area, nav bar) */
+    flex-grow: 1; /* Allow it to grow and fill the parent phone-wrapper */
+}
+
+/* Effect for when the screen is "off" or dimmed */
+.phone-screen-area.screen-off {
+    filter: brightness(0.25);
+    opacity: 0.9;
+}
+
+/* Wallpaper background for the phone screen */
+.wallpaper {
+    position: absolute;
+    inset: 0; /* top, right, bottom, left = 0, to cover the entire screen area */
+    background: linear-gradient(135deg, #6e45e2 0%, #89d4cf 100%); /* Default gradient */
+    opacity: 0.2; /* Subtlety */
+    z-index: 1; /* Behind all app content */
+}
+
+/* Phone Hardware Elements (Side Buttons) */
+.volume-btn,
+.power-btn {
+    position: absolute;
+    background: #333; /* Dark color for buttons */
+}
+
+.volume-btn {
+    left: -3px; /* Slightly outside the phone body */
+    top: 80px;
+    width: 3px;
+    height: 80px;
+}
+
+.power-btn {
+    right: -3px; /* Slightly outside the phone body */
+    top: 100px;
+    width: 3px;
+    height: 50px;
+}
+
+/* Notch (Top cutout for camera/speaker) */
+.notch {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 150px;
+    height: 25px;
+    background: #111; /* Matches phone body background */
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
+    z-index: 100; /* Above regular screen content */
+}
+
+.notch .camera,
+.notch .speaker {
+    position: absolute;
+    top: 50%;
+}
+
+.notch .camera {
+    right: 25px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #333;
+    transform: translateY(-50%);
+}
+
+.notch .speaker {
+    left: 50%;
+    width: 50px;
+    height: 4px;
+    background: #222;
+    border-radius: 3px;
+    transform: translate(-50%, -50%);
+}
+
+/* Phone's internal status bar (time, signal, battery) */
+.status-bar-phone {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 20px 0px 20px; /* Adjust padding for top bar */
+    color: white; /* Text color */
+    font-size: 0.8rem;
+    position: relative; /* Positioned below notch but still at top */
+    width: 100%;
+    z-index: 90; /* Above main content, below notch */
+    flex-shrink: 0; /* Prevents it from shrinking vertically */
+}
+
+.status-item-time {
+    font-weight: bold;
+}
+
+.status-icons-phone {
+    display: flex;
+    gap: 8px;
+}
+
+/* Notification Pop-up (toast) */
+.notification {
+    position: absolute;
+    top: 40px; /* Positioning from top of phone screen */
+    left: 15px;
+    width: calc(100% - 30px); /* Width adjusted for padding */
+    background: rgba(30, 30, 30, 0.7); /* Semi-transparent dark background */
+    backdrop-filter: blur(10px); /* Frosted glass effect */
+    border-radius: 15px;
+    padding: 10px;
+    color: white;
+    animation: slideIn 0.5s forwards; /* Animation for appearing */
+    display: none; /* Hidden by default, shown by JS */
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    z-index: 200; /* High z-index to overlay apps and launcher */
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.notification-title {
+    font-weight: bold;
+    font-size: 0.9rem;
+    margin-bottom: 4px;
+}
+
+.notification-content {
+    font-size: 0.8rem;
+    opacity: 0.9;
+}
+
+
+/* Phone Content Views (Main area for launcher and apps) */
+.content-area {
+    /* ADDED: Ensure it's a flex column and takes available space */
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1; /* Essential for it to fill the screen-area between status bar and nav bar */
+    position: relative; /* For absolute positioning of app views (launcher and individual apps) */
+    overflow: hidden; /* To contain app views that are positioned absolutely */
+}
+
+/* Generic app view styling (contacts, messages, slots, settings) */
+.app-view {
+    display: none; /* Hidden by default */
+    position: absolute; /* Apps overlay the launcher when open */
+    inset: 0; /* Fills the entire content-area */
+    flex-direction: column; /* Ensures app content also flows as a column (header, scrollable body, footer) */
+}
+
+.app-view.open {
+    display: flex; /* Show when active */
+}
+
+/* Home Screen (Launcher) UI */
+#phone-launcher-container {
+    /* ADDED: Ensure it's a flex column and fills content-area */
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1; /* Launcher should fill content-area when visible */
+    position: absolute; /* To allow app views to overlay it */
+    inset: 0; /* Fills the entire content-area */
+    z-index: 2; /* Below active apps, above wallpaper */
+    background-color: transparent; /* Or a subtle background */
+}
+
+/* Container for the main time/date on the launcher screen */
+.time-date-group { 
+    margin-top: 20px;
+    text-align: center;
+    flex-shrink: 0; /* Prevents it from shrinking */
+    color: white;
+    font-family: 'Segoe UI', sans-serif; 
+}
+
+/* Styles for the time and date text */
+.time-display { 
+    font-weight: 200;
+    font-size: 3.5rem;
+    margin-top: 20px;
+}
+
+.date-display { 
+    color: rgba(255, 255, 255, 0.7);
+    margin-top: 10px;
+    font-size: 1rem;
+}
+
+/* Wrapper for multiple launcher pages, enables horizontal swiping */
+.launcher-wrapper { 
+    display: flex;
+    flex-grow: 1; /* Allow launcher pages to take available space */
+    overflow: hidden; /* Crucial for horizontal swiping/translation */
+    transition: transform 0.3s ease-in-out; /* Smooth transition for page changes */
+}
+
+/* Individual launcher page */
+.launcher-page { 
+    flex-shrink: 0; /* Prevents pages from shrinking when multiple are present */
+    width: 100%;
+    height: 100%;
+    display: flex; /* To contain the app grid */
+    align-items: center; /* Center app grid vertically within the page */
+    justify-content: center; /* Center app grid horizontally within the page */
+}
+
+/* Grid for app icons within a launcher page */
+.app-grid { 
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* Default 3 columns */
+    gap: 20px; /* Spacing between icons */
+    padding: 25px; /* Padding around the grid */
+    width: 100%; /* Take full width of its container */
+    height: auto; /* Height determined by content */
+    max-height: 90%; /* To leave space for time/date/dots */
+    overflow-y: auto; /* Allow vertical scrolling if too many apps */
+}
+
+/* Pagination dots for launcher pages */
+.pagination-dots {
+    display: flex;
+    justify-content: center;
+    padding: 10px 0;
+    flex-shrink: 0;
+}
+
+.pagination-dots .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.3);
+    margin: 0 4px;
+    cursor: pointer;
+    transition: background-color 0.3s, opacity 0.3s;
+}
+
+.pagination-dots .dot.active {
+    background-color: white;
+}
+
+/* App icon styling */
+.app-icon {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    background: none; /* No default button background */
+    border: none; /* No default button border */
+    color: white; /* Default icon/label color */
+}
+
+.app-icon i {
+    font-size: 1.8rem;
+    width: 50px;
+    height: 50px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    display: grid;
+    place-items: center;
+}
+
+.app-icon .app-label {
+    font-size: 0.7rem;
+    opacity: 0.9;
+}
+
+.app-icon:hover {
+    transform: scale(1.1);
+}
+
+/* Specific app icon colors */
+.app-icon-blue i { background-color: #3498db; }
+.app-icon-green i { background-color: #2ecc71; }
+.app-icon-purple i { background-color: #9b59b6; }
+.app-icon-gray i { background-color: #7f8c8d; }
+.app-icon-orange i { background-color: #e67e22; }
+
+/* Android-style navigation bar at the bottom of the screen */
+.android-nav-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 48px; /* Standard nav bar height (was 40px, adjusted for better UX) */
+    background-color: #222; /* Dark background */
+    border-top: 1px solid #333; /* Separator line */
+    flex-shrink: 0; /* Prevents it from shrinking */
+    z-index: 10; /* Ensure it's above the launcher, but below apps */
+    padding: 0 5px; /* Add some horizontal padding */
+    display: flex; /* ADDED: Ensure it's a flex container for nav buttons */
+    align-items: center;
+    justify-content: space-around;
+}
+
+.nav-btn {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 8px 12px;
+    border-radius: 50%; /* Circular touch area */
+    transition: background-color 0.2s;
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    flex-grow: 1; /* Allow buttons to take up equal space */
+}
+
+.nav-btn:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Error Toast at the bottom of the phone screen */
+#phone-error-toast {
+    position: absolute;
+    bottom: 60px; /* Above nav bar (48px nav bar + 12px margin) */
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: var(--color-error);
+    color: white;
+    padding: 10px 15px;
+    border-radius: 8px;
+    display: none; /* Hidden by default, shown by JS */
+    z-index: 150; /* Above nav bar and app content */
+    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    width: calc(100% - 30px); /* Adjusted width to fit within phone screen padding */
+}
+
+#phone-error-toast p {
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+
+/* --- End of Phone CSS (excluding shared UI and app-specific styles in other files) --- */

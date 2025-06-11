@@ -1,0 +1,157 @@
+/* === Settings Overlay & Preview Styles === */
+
+.settings-loading, .settings-error {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    color: #fff;
+}
+
+.settings-loading .loading-spinner {
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: #fff;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s ease-infinite; /* Assuming @keyframes spin is in base.css or layout.css */
+    margin-bottom: 15px;
+}
+
+.settings-error {
+    color: var(--color-error, #ff6b6b);
+}
+
+.settings-error .error-message {
+    margin-bottom: 15px;
+    font-size: 1.1em;
+}
+
+.settings-error .retry-button {
+    padding: 8px 16px;
+    background-color: var(--color-primary, #007bff);
+    color: var(--color-on-primary, #ffffff);
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.settings-error .retry-button:hover {
+    opacity: 0.9;
+}
+
+.preview-mode {
+    position: relative;
+}
+
+.preview-mode::after {
+    content: 'Preview Mode';
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    padding: 4px 8px;
+    background: var(--color-accent-gold, #ffd700);
+    color: var(--color-on-primary, #000000);
+    font-size: 0.8em;
+    border-radius: 3px;
+    z-index: 999;
+}
+
+/* === Style Settings Panel Controls === */
+/* This is for the main menu settings panel. Phone-specific theme settings are in phone.css */
+.settings-controls-container {
+    overflow-y: auto;
+    max-height: 65vh;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    margin-top: var(--spacing-md);
+}
+
+.settings-group {
+    margin-bottom: var(--spacing-lg);
+    border: 1px solid var(--color-grey-dark);
+    padding: var(--spacing-md);
+    border-radius: var(--button-border-radius);
+}
+
+.settings-group legend {
+    font-weight: bold;
+    color: var(--color-primary);
+    padding: 0 var(--spacing-sm);
+    margin-bottom: var(--spacing-md);
+    font-size: 1.1rem;
+}
+
+.setting-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--spacing-md);
+    gap: var(--spacing-sm);
+}
+
+.setting-row:last-child {
+    margin-bottom: var(--spacing-xs);
+}
+
+.setting-row label {
+    margin-right: var(--spacing-sm);
+    font-size: 0.9rem;
+    color: var(--color-grey-light);
+    flex-shrink: 0;
+}
+
+.settings-controls-container input[type="color"],
+.settings-controls-container select,
+.settings-controls-container input[type="range"],
+.settings-controls-container input[type="number"] {
+    background-color: var(--color-dark-bg);
+    border: 1px solid var(--color-grey-mid);
+    color: var(--color-on-surface);
+    border-radius: var(--spacing-xs);
+    padding: var(--spacing-xs);
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+}
+
+.settings-controls-container input[type="color"] {
+    min-width: 60px;
+    height: 30px;
+    padding: 2px;
+}
+
+.settings-controls-container select {
+    min-width: 160px;
+    height: 30px;
+    padding: var(--spacing-xs) var(--spacing-sm);
+}
+
+.settings-controls-container input[type="range"] {
+    flex-grow: 1;
+    height: 20px;
+    accent-color: var(--color-primary);
+}
+
+.setting-row .value-display {
+    margin-left: var(--spacing-sm);
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    min-width: 30px;
+    text-align: right;
+}
+
+.settings-controls-container input:focus,
+.settings-controls-container select:focus {
+    outline: 2px solid var(--color-secondary);
+    outline-offset: 1px;
+    border-color: var(--color-secondary);
+}
+
+/* Note: Styles for .phone-content-view > .settings-controls-container and
+   #phone-theme-controls-container p are expected to be in phone.css */

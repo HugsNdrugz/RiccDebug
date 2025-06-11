@@ -1,0 +1,1145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rikk's Story Manager</title>
+    <style>
+        /* --- CSS STYLES --- */
+        :root {
+            --bg-color: #1a1a1a;
+            --surface-color: #2a2a2e;
+            --primary-color: #bb86fc; /* Purple */
+            --secondary-color: #03dac6; /* Teal */
+            --text-color: #e0e0e0;
+            --border-color: #444;
+            --input-bg: #333;
+            --btn-danger: #cf6679; /* Red */
+            --btn-success: #2ecc71; /* Green */
+            --btn-neutral: #555;
+            --hover-bg: #3f3f44;
+            --danger-hover-bg: #e74c3c;
+            --success-hover-bg: #27ae60;
+            --primary-hover-bg: #9b59b6;
+            --secondary-hover-bg: #1abc9c;
+            --menu-width-mobile: 85vw; /* 85% of viewport width */
+            --menu-width-desktop: 350px;
+        }
+
+        /* Global Reset and Basic Typography */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-size: 16px; /* Base font size for better mobile readability */
+            display: flex;
+            height: 100vh;
+            overflow: hidden; /* Prevents body scroll during page transitions */
+            position: relative; /* For the menu overlay */
+        }
+
+        /* App Container for Main Content */
+        #app-container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            position: relative; /* For inner positioning */
+            overflow: hidden;
+            transition: transform 0.3s ease-out; /* For pushing content if desired (not used here) */
+        }
+
+        /* Editor View (Main Content Area) */
+        #editor-view {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            background-color: var(--bg-color); /* Ensure full background cover */
+            z-index: 1; /* Below the menu and overlay */
+        }
+
+        /* Editor Header (Always visible for hamburger and title) */
+        .editor-header {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border-color);
+            background-color: var(--surface-color);
+            flex-shrink: 0;
+        }
+        .editor-header h2 {
+            flex-grow: 1;
+            margin: 0;
+            font-size: 1.2em;
+            color: var(--primary-color);
+            text-align: center; /* Center title */
+            margin-right: 48px; /* Space for hamburger if it wasn't there */
+            margin-left: 10px; /* Space from hamburger */
+        }
+
+        /* Hamburger Menu Icon */
+        #hamburger-menu-btn {
+            background: none;
+            border: none;
+            padding: 0; /* Remove default button padding */
+            font-size: 2em; /* Size the hamburger lines */
+            color: var(--secondary-color);
+            cursor: pointer;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            align-items: center;
+            position: relative;
+            z-index: 100; /* Ensure it's clickable above other content */
+            transition: transform 0.3s ease-out;
+        }
+
+        #hamburger-menu-btn .line {
+            width: 100%;
+            height: 3px;
+            background-color: var(--secondary-color);
+            border-radius: 2px;
+            transition: all 0.3s ease-out;
+        }
+
+        /* Hamburger animation to 'X' */
+        body.menu-open #hamburger-menu-btn {
+            transform: rotate(90deg); /* Rotate button container */
+        }
+        body.menu-open #hamburger-menu-btn .line:nth-child(1) {
+            transform: translateY(10px) rotate(45deg);
+        }
+        body.menu-open #hamburger-menu-btn .line:nth-child(2) {
+            opacity: 0; /* Middle line disappears */
+        }
+        body.menu-open #hamburger-menu-btn .line:nth-child(3) {
+            transform: translateY(-10px) rotate(-45deg);
+        }
+
+        /* Main Editor Content Area */
+        #editor-content {
+            flex-grow: 1;
+            padding: 15px 20px 20px 20px;
+            overflow-y: auto;
+            background-color: var(--bg-color); /* Matches body, good for transitions */
+        }
+
+        /* Initial Placeholder */
+        #initial-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            text-align: center;
+            color: #888;
+            font-size: 1.2em;
+            padding: 20px;
+        }
+        #initial-placeholder p {
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+
+        /* Editor Pane Styling (Content within #editor-content) */
+        .editor-pane {
+            background-color: var(--surface-color);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .editor-section {
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .editor-section h3 {
+            margin-top: 0;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+            color: var(--secondary-color);
+            font-size: 1.1em;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            font-size: 0.9em;
+            color: var(--primary-color);
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="number"],
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            background-color: var(--surface-color);
+            color: var(--text-color);
+            font-size: 1em;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 3px rgba(3, 218, 198, 0.3);
+        }
+
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        /* --- Buttons --- */
+        .btn {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: opacity 0.2s, background-color 0.2s, transform 0.1s;
+            white-space: nowrap;
+            font-size: 1em;
+        }
+        .btn:hover { opacity: 0.9; }
+        .btn:active { transform: translateY(1px); }
+
+        .btn-primary { background-color: var(--primary-color); color: #000; }
+        .btn-primary:hover { background-color: var(--primary-hover-bg); }
+
+        .btn-success { background-color: var(--btn-success); color: #000; }
+        .btn-success:hover { background-color: var(--success-hover-bg); }
+
+        .btn-danger { background-color: var(--btn-danger); color: #fff; }
+        .btn-danger:hover { background-color: var(--danger-hover-bg); }
+
+        .btn-neutral { background-color: var(--btn-neutral); color: #fff; }
+        .btn-neutral:hover { background-color: #666; }
+
+        .btn-add { background-color: var(--secondary-color); color: #000; font-size: 1.1em; line-height: 1; padding: 6px 12px;}
+        .btn-add:hover { background-color: var(--secondary-hover-bg); }
+
+        .btn-sm { padding: 6px 10px; font-size: 0.9em; }
+
+        /* Dynamic List Items (Dialogue Blocks, Conditions) */
+        .dynamic-list-item {
+            border: 1px dashed var(--border-color);
+            padding: 18px;
+            margin-bottom: 18px;
+            border-radius: 8px;
+            background-color: var(--bg-color);
+        }
+
+        .item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .item-header h4, .item-header h5 {
+            margin: 0;
+            color: var(--primary-color);
+            font-size: 1em;
+        }
+        .item-header h5 {
+            color: var(--secondary-color);
+        }
+        .item-header button {
+            margin-left: auto;
+        }
+
+        .form-group-inline {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 10px;
+            background-color: #222;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .form-group-inline label {
+            margin-bottom: 0;
+            flex-shrink: 0;
+        }
+        .form-group-inline span {
+            color: #aaa;
+        }
+        .form-group-inline select, .form-group-inline input {
+            flex-grow: 1;
+            min-width: 80px;
+        }
+        .form-group-inline input[type="text"] {
+            min-width: 100px;
+        }
+
+        /* --- New Customer Flow Styling --- */
+        #new-customer-flow-content {
+            padding: 20px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .new-customer-step-content {
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 20px;
+        }
+        .modal-actions {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+        /* Checkbox styling for dialogue contexts */
+        .checkbox-group label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            font-weight: normal;
+            color: var(--text-color);
+            background-color: var(--input-bg);
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+        .checkbox-group label:hover {
+            background-color: var(--hover-bg);
+            border-color: var(--secondary-color);
+        }
+        .checkbox-group input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            flex-shrink: 0;
+            accent-color: var(--secondary-color);
+            cursor: pointer;
+        }
+
+        /* Code Block for Payload */
+        pre {
+            background-color: #1a1a1a;
+            padding: 10px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            max-height: 200px;
+            border: 1px solid #000;
+        }
+
+        /* --- Customer List Menu (Slide-out) --- */
+        #customer-list-menu {
+            position: fixed;
+            top: 0;
+            left: 0; /* Starts off-screen */
+            width: var(--menu-width-mobile);
+            height: 100%;
+            background-color: var(--surface-color);
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.5);
+            transform: translateX(-100%); /* Hidden by default */
+            transition: transform 0.3s ease-out;
+            z-index: 20; /* Above main content, below overlay */
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Active state for the menu */
+        body.menu-open #customer-list-menu {
+            transform: translateX(0); /* Slide into view */
+        }
+
+        .menu-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border-color);
+            text-align: center;
+            font-size: 1.2em;
+            font-weight: bold;
+            color: var(--primary-color);
+            flex-shrink: 0;
+        }
+
+        #customer-list {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 15px;
+        }
+
+        .customer-card {
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            margin-bottom: 12px;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: background-color 0.2s, border-color 0.2s, box-shadow 0.2s;
+            user-select: none;
+        }
+        /* ... (rest of .customer-card, .customer-card-avatar, etc. styles remain largely the same) */
+
+        .customer-card:hover {
+            background-color: var(--hover-bg);
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 10px rgba(3, 218, 198, 0.2);
+        }
+
+        .customer-card.active {
+            background-color: var(--primary-color);
+            color: #000;
+            border-color: var(--secondary-color);
+            font-weight: bold;
+            box-shadow: 0 0 15px rgba(187, 134, 252, 0.3);
+        }
+
+        .customer-card-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            margin-right: 18px;
+            object-fit: cover;
+            border: 2px solid var(--primary-color);
+            flex-shrink: 0;
+            background-color: #666;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8em;
+            color: var(--text-color);
+            overflow: hidden;
+        }
+        .customer-card.active .customer-card-avatar {
+            border-color: var(--secondary-color);
+        }
+
+        .customer-card.create-new-card {
+            background-color: var(--surface-color);
+            border: 1px dashed var(--secondary-color);
+            flex-direction: column;
+            justify-content: center;
+            text-align: center;
+            min-height: 120px;
+        }
+        .customer-card.create-new-card .customer-card-avatar {
+            width: 70px;
+            height: 70px;
+            border: none;
+            background-color: transparent;
+            font-size: 3em;
+            color: var(--secondary-color);
+            margin: 0 0 10px 0;
+        }
+        .customer-card.create-new-card .customer-card-name {
+            font-size: 1.2em;
+            color: var(--secondary-color);
+            margin-bottom: 5px;
+        }
+        .customer-card.create-new-card .customer-card-key {
+            font-size: 0.9em;
+            color: #aaa;
+        }
+        .customer-card.create-new-card:hover {
+            background-color: #3f3f44;
+            box-shadow: 0 0 10px rgba(3, 218, 198, 0.4);
+        }
+        /* --- Menu Overlay --- */
+        #menu-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            z-index: 15; /* Between menu and main content */
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease-out, visibility 0.3s ease-out;
+        }
+        body.menu-open #menu-overlay {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* --- Desktop Specific Styles (min-width: 1024px) --- */
+        @media (min-width: 1024px) {
+            /* Desktop Layout - Customer list as fixed sidebar */
+            #app-container {
+                flex-direction: row; /* Horizontal layout */
+            }
+
+            #customer-list-menu {
+                position: relative; /* Not fixed anymore */
+                transform: translateX(0); /* Always visible */
+                width: var(--menu-width-desktop);
+                box-shadow: none; /* No shadow needed */
+                border-right: 1px solid var(--border-color); /* Add a border */
+            }
+
+            #editor-view {
+                flex-grow: 1; /* Takes remaining space */
+            }
+
+            /* Hide hamburger on desktop */
+            #hamburger-menu-btn {
+                display: none;
+            }
+
+            /* Adjust editor header for desktop (no hamburger space needed) */
+            .editor-header h2 {
+                text-align: left;
+                margin-left: 0;
+                margin-right: 0;
+            }
+
+            /* Hide overlay on desktop */
+            #menu-overlay {
+                display: none;
+            }
+        }
+
+    </style>
+</head>
+<body>
+    <div id="app-container">
+        <!-- Editor/Creator View (Main Content) -->
+        <div id="editor-view">
+            <div class="editor-header">
+                <button id="hamburger-menu-btn" aria-label="Open customer menu">
+                    <div class="line"></div>
+                    <div class="line"></div>
+                    <div class="line"></div>
+                </button>
+                <h2 id="editor-title">Rikk's Story Manager</h2>
+            </div>
+            <div id="editor-content">
+                <!-- Editor or New Customer Flow content will be rendered here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Customer List Menu (Slide-out) -->
+    <div id="customer-list-menu">
+        <div class="menu-header">
+            <h2>Customers</h2>
+        </div>
+        <div id="customer-list">
+            <!-- Customer cards will be rendered here by JavaScript -->
+        </div>
+    </div>
+
+    <!-- Menu Overlay -->
+    <div id="menu-overlay"></div>
+
+    <script>
+        // --- JAVASCRIPT LOGIC ---
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // =================================================================
+            // 1. HARD-CODED STATE & CONFIGURATION
+            // =================================================================
+
+            let appState = {
+                customers: {},
+                activeCustomerKey: null,
+                creatingNewCustomer: false,
+                isMenuOpen: false, // New state for menu visibility
+            };
+
+            let newCustomerFlowState = {
+                step: 0,
+                data: {
+                    key: '',
+                    baseName: '',
+                    avatarUrl: '',
+                    initialMood: 'chill',
+                    selectedDialogueContexts: []
+                }
+            };
+
+            const CONFIG = {
+                stats: ['mood', 'loyalty', 'patience', 'relationship'],
+                moods: ['desperate', 'paranoid', 'happy', 'angry', 'chill', 'arrogant', 'cautious', 'nosy', 'manic', 'dreamy'],
+                operators: ['is', 'isNot', 'gt', 'gte', 'lt', 'lte'],
+                commonDialogueContexts: ['greeting', 'lowCashRikk', 'rikkDeclinesToBuy', 'rikkDeclinesToSell', 'rikkBuysSuccess', 'rikkSellsSuccess']
+                // Payload definitions are simplified for this MVP, but can be expanded
+            };
+
+            const initialCustomerTemplates = {
+                "DESPERATE_FIEND": { "key": "DESPERATE_FIEND", "baseName": "Jittery Jerry", "avatarUrl": "https://randomuser.me/api/portraits/men/32.jpg", "baseStats": { "mood": "desperate", "loyalty": 0, "patience": 3, "relationship": 0 }, "dialogue": { "greeting": [ { "conditions": [ { "stat": "mood", "op": "is", "value": "paranoid" } ], "lines": [ "(Eyes wide, whispering, twitching) Rikk? Rikk, man, you gotta help me! The shadows are whispering my PIN number! I need that [ITEM_NAME] before the squirrels start judging my life choices. How much? And tell me that pigeon isn't a cop! It's wearing a tiny earpiece, I swear!", "(Voice trembling) Rikk? You alone? I heard a click on my phone... pretty sure it was the Feds, or maybe just my teeth chattering too loud. Need that [ITEM_NAME] man, my brain's trying to do sudoku with my anxieties. What's the toll, and make it snappy, the streetlights are blinking in Morse code!" ], "payload": { "type": "EFFECT", "effects": [] } }, { "conditions": [ { "stat": "mood", "op": "is", "value": "happy" } ], "lines": [ "(Grinning ear-to-ear, slightly too loud) RIKK! My savior! You're like a guardian angel, but with better connections! Last batch had me convinced I could talk to cats! Turns out, they're terrible conversationalists. Got more of that magic [ITEM_NAME]? Price is just a number when you're floating! My rent can wait, my sanity can't!", "(Beaming) Woo! Rikk! Feeling like a king today! Or at least a moderately successful duke! That last score? *Chef's kiss*. Got more of that [ITEM_NAME]? I'm ready to solve all the world's problems, starting with my own lack of... this." ], "payload": { "type": "EFFECT", "effects": [] } }, { "conditions": [ { "stat": "mood", "op": "is", "value": "angry" } ], "lines": [ "Alright Rikk, enough games! It's me, [CUSTOMER_NAME], and I'm about two seconds from screaming into a traffic cone! I need my [ITEM_NAME] and I need it YESTERDAY! How much, and don't you dare jerk me around!", "Rikk! You see me? Good. Because I'm seeing RED. Need that [ITEM_NAME]. NOW. Price better be right, or I'm gonna start reviewing your establishment on Yelp, and it won't be pretty." ], "payload": { "type": "EFFECT", "effects": [] } }, { "conditions": [], "lines": [ "Rikk! Thank god! It's me, [CUSTOMER_NAME]! My soul is trying to escape through my eyeballs. I'm hurtin' bad, need that [ITEM_NAME]... How much you asking? Don't play hard to get, Rikk, my nerves are doing the Macarena.", "Yo, uh, you Rikk? They said you were the shaman of the streets. I'm hurtin' bad, need that [ITEM_NAME]... How much you asking? Don't play hard to get, Rikk, my nerves are doing the Macarena.", "Rikk, my man! [CUSTOMER_NAME] here! My insides feel like a washing machine full of angry badgers. That [ITEM_NAME], what's the damage? And please, tell me it's the good stuff, my disappointment tolerance is at an all-time low.", "You Rikk? Heard you're the guy. Got that... *medicine*? Specifically the [ITEM_NAME] kind. Price? And be gentle, my wallet's already crying." ], "payload": { "type": "EFFECT", "effects": [] } } ], "lowCashRikk": [ { "conditions": [{"stat": "mood", "op": "is", "value": "paranoid"}], "lines": ["(Eyes darting) No cash?! Rikk, the static on the TV is calling me names! You gotta find some, man, before I try to pay with my collection of bottle caps!", "Broke?! Are you trying to make the shadow people win, Rikk?! They feed on disappointment!"], "payload": {"type": "EFFECT", "effects": []}}, { "conditions": [{"stat": "mood", "op": "is", "value": "happy"}], "lines": ["Aww, Rikk, you party pooper! I was about to teach you the secret handshake of the enlightened! Go shake down your couch cushions, I'll wait... and maybe try to levitate.", "No moolah? Come on, Rikk! My chakras were aligning for this! Now they're just... awkwardly bumping into each other."], "payload": {"type": "EFFECT", "effects": []}}, { "conditions": [], "lines": ["You broke, Rikk? Seriously? My dealer being broke is like my therapist needing therapy. Unsettling, man. I'm about to start seeing sound waves.", "No cash? My hope just did a swan dive off a very tall building. You sure you checked under the mattress, Rikk?"], "payload": {"type": "EFFECT", "effects": []}} ], "rikkDeclinesToBuy": [ { "conditions": [{"stat": "mood", "op": "is", "value": "paranoid"}], "lines": ["(Gasping) You don't want this priceless artifact?! Is it bugged?! Did *they* tell you not to take it?! Just take it, before the gnomes in my cereal box stage an intervention!", "Not buying?! Is this a test, Rikk? Am I being recorded?! This is a perfectly normal, slightly stained... heirloom!"], "payload": {"type": "EFFECT", "effects": []}}, { "conditions": [{"stat": "mood", "op": "is", "value": "happy"}], "lines": ["No dice, huh? Well, more for me! Or, you know, for the pawn shop. Gotta fund my dream of competitive napping.", "Your loss, Rikk! This baby was gonna fund my new career as a professional cloud-watcher! So much potential!"], "payload": {"type": "EFFECT", "effects": []}}, { "conditions": [], "lines": ["What, Rikk? This is vintage! Okay, maybe not vintage, but it's definitely... something. My guts are playing the blues, man!", "Seriously? You're passing this up? My cat seemed to like it. And she's got impeccable taste... for a cat."], "payload": {"type": "EFFECT", "effects": []}} ], "rikkDeclinesToSell": [ { "conditions": [{"stat": "mood", "op": "is", "value": "paranoid"}], "lines": ["(Voice cracking) You holdin' out?! Are you working with the squirrels?! They're organized, Rikk, they have a tiny general! Don't do this to me, my brain feels like a shaken snow globe!", "No sell?! Is this because of that thing I said about your haircut? I take it back! It's... avant-garde! Just gimme the stuff!"], "payload": {"type": "EFFECT", "effects": []}}, { "conditions": [{"stat": "mood", "op": "is", "value": "happy"}], "lines": ["Aww, man! You're harshing my mellow! I was just about to achieve nirvana, or at least find my other sock. Well, back to reality, I guess. It bites.", "No deal? Dang. And I was all set to write a symphony inspired by this exact moment of... not getting what I want. Tragic, really."], "payload": {"type": "EFFECT", "effects": []}}, { "conditions": [], "lines": ["Come on, Rikk! You holding out is like a doughnut shop running out of glaze! It's just... wrong. My spirit animal is a deflated bouncy castle right now.", "You serious, Rikk? My disappointment is immeasurable, and my day is ruined. Thought we were boys!"], "payload": {"type": "EFFECT", "effects": []}} ], "rikkBuysSuccess": [ { "conditions": [{"stat": "mood", "op": "is", "value": "paranoid"}], "lines": ["(Snatches cash, looking around wildly) Good. Thanks. Gotta go. The pigeons are deploying their drones. Don't follow me, and if you see a man in a trench coat made of squirrels, run!", "Alright, alright. Cash received. Now I can finally afford that tinfoil upgrade for my windows. They're listening, Rikk. They're always listening."], "payload": {"type": "EFFECT", "effects": []}}, { "conditions": [{"stat": "mood", "op": "is", "value": "happy"}], "lines": ["Sweet cash! You're a legend, Rikk! Now I can afford that luxury ramen I've been eyeing! Or maybe just more... *this*. Decisions, decisions!", "Woo-hoo! Money! I feel like a millionaire! A very temporary, slightly twitchy millionaire! Thanks, Rikk!"], "payload": {"type": "EFFECT", "effects": []}}, { "conditions": [], "lines": ["Preciate it, Rikk. You a real one. Gotta go chase that dragon... or maybe just a really good taco.", "Solid. This helps. Now I can stop hearing the voices... or at least, they'll be saying nicer things."], "payload": {"type": "EFFECT", "effects": [{"type": "triggerEvent","eventName": "publicIncident","chance": 0.15,"condition": {"stat": "mood","op": "isNot","value": "happy"},"heatValue": 3}]}} ], "rikkSellsSuccess": [ { "conditions": [{"stat": "mood", "op": "is", "value": "paranoid"}], "lines": ["(Grabs item, hides it immediately) Yeah, that's the ticket. Good lookin'. Now, if you'll excuse me, I think the mailman is trying to read my thoughts. Gotta wear my tinfoil beanie.", "Got it. Safe. Now to find a place where the walls don't have eyes... or mouths. This is harder than it looks, Rikk."], "payload": {"type": "EFFECT", "effects": []}}, { "conditions": [{"stat": "mood", "op": "is", "value": "happy"}], "lines": ["YES! That's the ambrosia! My brain cells are throwing a party and you're invited, Rikk! Figuratively, of course. Unless you have snacks.", "Oh, sweet relief! It's like my soul just got a spa day! You're the best, Rikk! Like, a five-star dealer!"], "payload": {"type": "EFFECT", "effects": []}}, { "conditions": [], "lines": ["Yeah, that's the good stuff. Phew... my soul just sighed in relief.", "Nice. This'll do. Now I can finally face... well, probably just another Tuesday. But slightly less horribly."], "payload": {"type": "EFFECT", "effects": [{"type": "triggerEvent","eventName": "publicIncident","chance": 0.15,"condition": {"stat": "mood","op": "isNot","value": "happy"},"heatValue": 3}]}} ] } },
+                "HIGH_ROLLER": { "key": "HIGH_ROLLER", "baseName": "Baron Von Blaze", "avatarUrl": "https://randomuser.me/api/portraits/men/45.jpg", "baseStats": { "mood": "arrogant", "loyalty": 0, "patience": 3, "relationship": 0 }, "dialogue": { "greeting": [ { "conditions": [{"stat": "mood", "op": "is", "value": "paranoid"}], "lines": ["(Voice low, impeccably dressed but eyes scanning) Rikk. A word. Is this establishment... secure? One hears whispers. I require absolute discretion for my acquisition of [ITEM_NAME]. A blemish on my reputation is more costly than any bauble you might possess. And my tailor is very judgemental.", "(Adjusts cufflinks, gaze sharp) Rikk. The usual precautions, I trust? My associates value... silence. As do I. The [ITEM_NAME] in question must be... untainted. My patience for complications is famously thin."], "payload": {"type": "EFFECT", "effects": []}}, { "conditions": [{"stat": "mood", "op": "is", "value": "happy"}], "lines": ["(A charming, yet slightly condescending smile) Ah, Rikk, my purveyor of peccadilloes! I trust your offerings today are as refined as my taste in... well, everything. Life's too short for cheap thrills, or cheap people, for that matter. What delicacy do you have for my discerning palate regarding [ITEM_NAME]? I hope it pairs well with my vintage Bordeaux and impending world domination.", "(Chuckles lightly) Rikk. Always a pleasure. Or, at least, a necessary transaction. The [ITEM_NAME] – I expect nothing less than your finest. Mediocrity is a contagion I actively avoid."], "payload": {"type": "EFFECT", "effects": []}} ], "rikkBuysSuccess": [ { "conditions": [], "lines": ["Satisfactory. Your service is noted, Rikk. Continue to provide this level of quality, and our association will be mutually beneficial.", "As expected. Keep this standard, Rikk. My associates have... high expectations."], "payload": {"type": "EFFECT", "effects": [{"type": "triggerEvent","eventName": "highRollerTip","chance": 0.1,"tipPercentage": 0.05,"credValue": 1}]}} ], "rikkSellsSuccess": [ { "conditions": [], "lines": ["Indeed. This meets the standard. Until our next transaction, Rikk. Maintain the quality.", "Precisely. You may inform your... lesser clients that this level of product is reserved."], "payload": {"type": "EFFECT", "effects": [{"type": "triggerEvent","eventName": "highRollerTip","chance": 0.1,"tipPercentage": 0.05,"credValue": 1}]}} ] } },
+                "REGULAR_JOE": { "key": "REGULAR_JOE", "baseName": "Chill Chad", "avatarUrl": "https://randomuser.me/api/portraits/women/67.jpg", "baseStats": { "mood": "chill", "loyalty": 0, "patience": 3, "relationship": 0 }, "dialogue": { "greeting": [ { "conditions": [], "lines": ["Hey Rikk, what's up? Just swinging by for some [ITEM_NAME]. Got anything good today?", "Yo, Rikk. Long time no see. How's it hangin'? Got that [ITEM_NAME]?", "Sup, Rikk? Need some [ITEM_NAME] to get through the day. What's the damage?"], "payload": {"type": "EFFECT", "effects": []}}, ], "lowCashRikk": [ { "conditions": [], "lines": ["No cash, huh? Bummer. Guess I'll come back later.", "Ah, that's a drag. Alright, Rikk, I'll catch you when you're loaded."], "payload": {"type": "EFFECT", "effects": []}}, ], "rikkDeclinesToBuy": [ { "conditions": [], "lines": ["No worries, man. Someone else will take it off my hands.", "Alright, your loss. Peace."], "payload": {"type": "EFFECT", "effects": []}}, ], "rikkDeclinesToSell": [ { "conditions": [], "lines": ["Damn, really? That sucks. Alright, I'll find it somewhere else.", "Rough. Guess I'm outta luck today."], "payload": {"type": "EFFECT", "effects": []}}, ], "rikkBuysSuccess": [ { "conditions": [], "lines": ["Thanks, Rikk. Easy money.", "Good deal. Later, man."], "payload": {"type": "EFFECT", "effects": []}}, ], "rikkSellsSuccess": [ { "conditions": [], "lines": ["Nice, thanks Rikk. This'll hit the spot.", "Perfect. Catch ya around."], "payload": {"type": "EFFECT", "effects": []}}, ] } },
+                "INFORMANT": { "key": "INFORMANT", "baseName": "Whiskey Whisper", "avatarUrl": "https://randomuser.me/api/portraits/men/50.jpg", "baseStats": { "mood": "cautious", "loyalty": 0, "patience": 3, "relationship": 0 }, "dialogue": { "greeting": [ { "conditions": [], "lines": ["(Eyes scanning, voice low) Rikk. Got a minute? I hear you're the one to talk to about [ITEM_NAME]. Looking for discretion, and a fair price. Don't want any unwanted attention.", "Rikk. I'm here about the [ITEM_NAME]. Keep it quiet, alright? Information is currency, and so is this. What's the deal?"], "payload": {"type": "EFFECT", "effects": []}}, ], "rikkSellsSuccess": [ { "conditions": [], "lines": ["(Nods slowly) Good. This changes things. For the better, I hope.", "Understood. The less said, the better. You'll be hearing from me."], "payload": {"type": "EFFECT", "effects": [{"type": "triggerEvent","eventName": "rivalOpChance","chance": 0.2,"heatValue": 5,"credValue": 1}]}} ] } },
+                "SNITCH": { "key": "SNITCH", "baseName": "Concerned Carol", "avatarUrl": "https://randomuser.me/api/portraits/women/12.jpg", "baseStats": { "mood": "nosy", "loyalty": 0, "patience": 3, "relationship": 0 }, "dialogue": { "greeting": [ { "conditions": [], "lines": ["(Leaning in, conspiratorially) Rikk! Oh, it's you. Just, you know, checking in. Heard you might have some... *things*. Like [ITEM_NAME]? The neighborhood's been so quiet lately. Too quiet.", "Rikk, dear. Carol here. My, my, busy as always, are we? Just wondering if you have any [ITEM_NAME]. And, you know, what's been going on around here?"], "payload": {"type": "EFFECT", "effects": []}}, ], "rikkSellsSuccess": [ { "conditions": [], "lines": ["Oh, that's... *noted*. Thanks, Rikk. Very... informative.", "Interesting. I'll be sure to... remember this. Thanks."], "payload": {"type": "EFFECT", "effects": [{"type": "triggerEvent","eventName": "snitchReport","chance": 0.65,"heatValue": 15,"credValue": -2}]}} ] } },
+                "STIMULANT_USER": { "key": "STIMULANT_USER", "baseName": "Motor-Mouth Marty", "avatarUrl": "https://randomuser.me/api/portraits/men/3.jpg", "baseStats": { "mood": "manic", "loyalty": 0, "patience": 3, "relationship": 0 }, "dialogue": { "greeting": [ { "conditions": [], "lines": [ "Rikk! My man! My legend! You will NOT believe the idea I just had! We're talking revolutionary, Rikk, REVOLUTIONARY! It involves pigeons, a thousand tiny jetpacks, and a synchronized aerial ballet that will solve rush hour traffic! PERMANENTLY! Oh, right, yeah, you got any of that [ITEM_NAME]? My brain's going a million miles a minute, and I need to keep up with it! How much for the zoom-zoom juice? And have you ever wondered if squirrels are just tiny, furry spies? Because I have. Extensively.", "Whoa, Rikk, TIMING! I was just explaining to this lamppost here how the entire global economy is secretly controlled by llamas! It's all in the wool, Rikk, the WOOL! They're playing the long game! Anyway, you got that [ITEM_NAME]? I need to, uh, process some very important data. Very, very fast. Price? Don't care, just NEED IT! You ever try to teach a fish to play poker? It's harder than it looks, man, way harder!", "Marty! No, wait, Rikk! It's me, [CUSTOMER_NAME]! Or am I Marty? Doesn't matter! Got any of that [ITEM_NAME]? I'm onto something HUGE! Bigger than breadboxes! Bigger than... than... BIG THINGS! My thoughts are racing like caffeinated cheetahs, Rikk! We should invent a new color! Something... LOUDER! How much for the go-go powder?", "You Rikk? Heard you're the wizard of WHIZZ! The sultan of SPEED! The... uh... guy with the good stuff! Name's [CUSTOMER_NAME], and I'm on a MISSION! A mission fueled by ideas and, hopefully, soon, by that sweet, sweet [ITEM_NAME]! So, what's the word, bird? And why DO birds suddenly appear? Is it a government conspiracy? Let's discuss!" ], "payload": { "type": "EFFECT", "effects": [] } } ] } },
+                "PSYCHEDELIC_EXPLORER": { "key": "PSYCHEDELIC_EXPLORER", "baseName": "Cosmic Connie", "avatarUrl": "https://randomuser.me/api/portraits/women/80.jpg", "baseStats": { "mood": "dreamy", "loyalty": 0, "patience": 3, "relationship": 0 }, "dialogue": { "greeting": [ { "conditions": [], "lines": [ "Greetings, fellow traveler! Rikk, is it? Or are you just, like, a reflection of Rikk? Whoa. Heavy. I was just pondering the interconnectedness of all things, you know? Like, what if this sidewalk is actually, like, the eyebrow of a giant? Anyway, you got any of [ITEM_NAME]? My soul is trying to dial into the cosmic modem.", "Rikk, my dude! I had this epiphany! What if, like, colors are just, like, opinions, man? And we all see them differently? Mind blown, right? So, about that [ITEM_NAME]... I'm trying to paint a sound, and I think that's the missing ingredient. You feel me? The universe is singing, Rikk, but I think it's off-key.", "Connie! No, wait, that's me. You're Rikk! Or are we all Rikk? Lost in the cosmic sauce again, man. Got any of that [ITEM_NAME]? The patterns in my ceiling are telling me it's time for a spiritual tune-up. They speak in, like, very insistent paisley, you know?", "Hey... are you Rikk? The name vibes with my aura. I'm [CUSTOMER_NAME], or maybe I'm just a collection of stardust experiencing itself. Pretty wild, huh? I'm on a quest for some [ITEM_NAME]. My spirit guide, a talking badger named Bartholomew, said you'd have the good stuff. He's usually right about these things. Especially after three cups of herbal tea." ], "payload": { "type": "EFFECT", "effects": [] } } ] } }
+            };
+
+            appState.customers = initialCustomerTemplates;
+
+            const editorView = document.getElementById('editor-view');
+            const editorTitle = document.getElementById('editor-title');
+            const customerListEl = document.getElementById('customer-list');
+            const editorContentEl = document.getElementById('editor-content');
+            const hamburgerMenuBtn = document.getElementById('hamburger-menu-btn');
+            const customerListMenu = document.getElementById('customer-list-menu');
+            const menuOverlay = document.getElementById('menu-overlay');
+            const body = document.body; // Reference to body for menu-open class
+
+            const NEW_CUSTOMER_FLOW_STEPS = [
+                { title: 'Basic Info', render: renderNewCustomerStep1, validate: validateNewCustomerStep1 },
+                { title: 'Base Stats & Dialogue', render: renderNewCustomerStep2, validate: validateNewCustomerStep2 },
+                { title: 'Review & Create', render: renderNewCustomerStep3, validate: validateNewCustomerStep3 }
+            ];
+
+            // =================================================================
+            // 2. RENDERING FUNCTIONS
+            // =================================================================
+
+            /**
+             * Renders the list of customer cards in the customer list menu.
+             */
+            function renderCustomerList() {
+                customerListEl.innerHTML = ''; // Clear existing list
+                const keys = Object.keys(appState.customers).sort();
+
+                // Add "Create New Customer" card at the top
+                const createNewCard = document.createElement('div');
+                createNewCard.className = 'customer-card create-new-card';
+                createNewCard.innerHTML = `
+                    <div class="customer-card-avatar">+</div>
+                    <div class="customer-card-info">
+                        <div class="customer-card-name">Create New Customer</div>
+                        <div class="customer-card-key">Add a new story archetype</div>
+                    </div>
+                `;
+                createNewCard.addEventListener('click', handleCreateCustomerClick);
+                customerListEl.appendChild(createNewCard);
+
+                // Render existing customer cards
+                keys.forEach(key => {
+                    const customer = appState.customers[key];
+                    const card = document.createElement('div');
+                    card.className = `customer-card ${key === appState.activeCustomerKey ? 'active' : ''}`;
+                    card.dataset.key = key; // Store the key for event handling
+                    card.innerHTML = `
+                        <img src="${customer.avatarUrl || 'https://via.placeholder.com/60/555555/FFFFFF?text=NO+IMG'}" alt="${customer.baseName}" class="customer-card-avatar" onerror="this.onerror=null;this.src='https://via.placeholder.com/60/555555/FFFFFF?text=NO+IMG';"/>
+                        <div class="customer-card-info">
+                            <div class="customer-card-name">${customer.baseName}</div>
+                            <div class="customer-card-key">${customer.key}</div>
+                        </div>
+                    `;
+                    card.addEventListener('click', () => handleCustomerSelect(key));
+                    customerListEl.appendChild(card);
+                });
+            }
+
+            /**
+             * Renders the main content area (either the editor, new customer flow, or placeholder).
+             */
+            function renderMainContent() {
+                if (appState.creatingNewCustomer) {
+                    renderNewCustomerFlow();
+                    editorTitle.textContent = `New Customer: Step ${newCustomerFlowState.step + 1} - ${NEW_CUSTOMER_FLOW_STEPS[newCustomerFlowState.step].title}`;
+                } else if (appState.activeCustomerKey) {
+                    renderCustomerEditor(appState.activeCustomerKey);
+                    const customer = appState.customers[appState.activeCustomerKey];
+                    editorTitle.textContent = `Editing: ${customer.baseName} (${customer.key})`;
+                } else {
+                    editorContentEl.innerHTML = `
+                        <div id="initial-placeholder">
+                            <p>Select a customer from the menu to begin editing their story.</p>
+                            <p>Or click the '<span style="color: var(--secondary-color); font-weight: bold;">+</span> Create New Customer' card to add a new archetype.</p>
+                        </div>
+                    `;
+                    editorTitle.textContent = `Rikk's Story Manager`;
+                }
+            }
+
+            /**
+             * Renders the full editor for the currently active customer.
+             * @param {string} key - The key of the customer to edit.
+             */
+            function renderCustomerEditor(key) {
+                const customer = appState.customers[key];
+                if (!customer) {
+                    editorContentEl.innerHTML = `<div class="placeholder-text"><p>Customer not found.</p></div>`;
+                    return;
+                }
+
+                const createSelectOptions = (options, selectedValue) => options.map(opt =>
+                    `<option value="${opt}" ${opt === selectedValue ? 'selected' : ''}>${opt}</option>`
+                ).join('');
+
+                editorContentEl.innerHTML = `
+                    <div class="editor-pane">
+                        <div class="editor-section">
+                            <h3>Basic Info</h3>
+                            <div class="form-group">
+                                <label>Key (Unique ID)</label>
+                                <input type="text" value="${customer.key}" name="key" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label>Base Name</label>
+                                <input type="text" value="${customer.baseName}" name="baseName">
+                            </div>
+                            <div class="form-group">
+                                <label>Avatar URL</label>
+                                <input type="text" value="${customer.avatarUrl || ''}" name="avatarUrl" placeholder="e.g., https://randomuser.me/api/portraits/men/99.jpg">
+                            </div>
+                        </div>
+
+                        <div class="editor-section">
+                            <h3>Base Stats</h3>
+                            <div class="form-group">
+                                <label>Initial Mood</label>
+                                <select name="baseStats.mood">${createSelectOptions(CONFIG.moods, customer.baseStats.mood)}</select>
+                            </div>
+                            <div class="form-group">
+                                <label>Loyalty</label>
+                                <input type="number" value="${customer.baseStats.loyalty}" name="baseStats.loyalty">
+                            </div>
+                            <div class="form-group">
+                                <label>Patience</label>
+                                <input type="number" value="${customer.baseStats.patience}" name="baseStats.patience">
+                            </div>
+                            <div class="form-group">
+                                <label>Relationship</label>
+                                <input type="number" value="${customer.baseStats.relationship}" name="baseStats.relationship">
+                            </div>
+                        </div>
+
+                        <div class="editor-section">
+                            <h3>Dialogue Nodes</h3>
+                            <button class="btn btn-add" data-action="add-dialogue-node">+ Add Dialogue Context</button>
+                            <div id="dialogue-nodes-container" style="margin-top: 20px;">
+                                ${Object.keys(customer.dialogue || {}).sort().map(nodeKey => `
+                                    <div class="dynamic-list-item">
+                                        <div class="item-header">
+                                            <h4>Context: ${nodeKey}</h4>
+                                            <button class="btn btn-danger btn-sm" data-action="remove-dialogue-node" data-node-key="${nodeKey}">Remove</button>
+                                        </div>
+                                        <button class="btn btn-add btn-sm" data-action="add-conditional-block" data-node-key="${nodeKey}">+ Add Conditional Block</button>
+                                        ${(customer.dialogue[nodeKey] || []).map((block, blockIndex) => `
+                                            <div class="dynamic-list-item" style="margin-top: 15px; background-color: var(--surface-color);">
+                                                <div class="item-header">
+                                                    <h5>Conditional Block ${blockIndex + 1}</h5>
+                                                    <button class="btn btn-danger btn-sm" data-action="remove-conditional-block" data-node-key="${nodeKey}" data-block-index="${blockIndex}">X Remove</button>
+                                                </div>
+                                                <h6>Conditions</h6>
+                                                <button class="btn btn-add btn-sm" data-action="add-condition" data-node-key="${nodeKey}" data-block-index="${blockIndex}">+ Add Condition</button>
+                                                <div style="margin-top: 10px;">
+                                                    ${(block.conditions || []).map((cond, condIndex) => `
+                                                        <div class="form-group form-group-inline">
+                                                            <span>IF</span>
+                                                            <select name="dialogue.${nodeKey}.${blockIndex}.conditions.${condIndex}.stat">${createSelectOptions(CONFIG.stats, cond.stat)}</select>
+                                                            <select name="dialogue.${nodeKey}.${blockIndex}.conditions.${condIndex}.op">${createSelectOptions(CONFIG.operators, cond.op)}</select>
+                                                            <input type="text" value="${cond.value}" name="dialogue.${nodeKey}.${blockIndex}.conditions.${condIndex}.value">
+                                                            <button class="btn btn-danger btn-sm" data-action="remove-condition" data-node-key="${nodeKey}" data-block-index="${blockIndex}" data-cond-index="${condIndex}">-</button>
+                                                        </div>
+                                                    `).join('')}
+                                                </div>
+                                                <h6>Lines (one per line)</h6>
+                                                <textarea name="dialogue.${nodeKey}.${blockIndex}.lines" rows="${Math.max(3, (block.lines || []).length + 1)}">${(block.lines || []).join('\n')}</textarea>
+                                                <h6>Payload (Read-Only)</h6>
+                                                <pre>${JSON.stringify(block.payload || { type: "EFFECT", effects: [] }, null, 2)}</pre>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                        <div class="editor-section">
+                            <h3>Customer Actions</h3>
+                            <button class="btn btn-danger" data-action="delete-customer">Delete Customer Archetype</button>
+                        </div>
+                    </div>
+                `;
+                addEditorEventListeners();
+            }
+
+            /**
+             * Renders the multi-step form for creating a new customer.
+             */
+            function renderNewCustomerFlow() {
+                const currentStep = NEW_CUSTOMER_FLOW_STEPS[newCustomerFlowState.step];
+                editorContentEl.innerHTML = `
+                    <div id="new-customer-flow-content" class="editor-pane">
+                        <div class="new-customer-step-content">
+                            ${currentStep.render(newCustomerFlowState.data)}
+                        </div>
+                        <div class="modal-actions">
+                            ${newCustomerFlowState.step > 0 ? `<button id="new-customer-back-btn" class="btn btn-neutral">Back</button>` : ''}
+                            <button id="new-customer-next-btn" class="btn btn-primary">${newCustomerFlowState.step === NEW_CUSTOMER_FLOW_STEPS.length - 1 ? 'Create Customer' : 'Next'}</button>
+                        </div>
+                    </div>
+                `;
+
+                if (newCustomerFlowState.step > 0) {
+                    document.getElementById('new-customer-back-btn').addEventListener('click', handleNewCustomerFlowBack);
+                }
+                document.getElementById('new-customer-next-btn').addEventListener('click', handleNewCustomerFlowNext);
+
+                const flowContentEl = document.getElementById('new-customer-flow-content');
+                if (flowContentEl) {
+                    flowContentEl.querySelectorAll('input[type="text"], input[type="number"], select').forEach(input => {
+                        const eventType = input.tagName === 'SELECT' ? 'change' : 'input';
+                        input.addEventListener(eventType, (e) => {
+                            const prop = e.target.dataset.prop;
+                            if (prop) {
+                                newCustomerFlowState.data[prop] = e.target.value;
+                            }
+                        });
+                    });
+
+                    if (newCustomerFlowState.step === 1) {
+                        flowContentEl.querySelectorAll('input[type="checkbox"][data-prop="selectedDialogueContexts"]').forEach(checkbox => {
+                            checkbox.addEventListener('change', (e) => {
+                                const value = e.target.value;
+                                if (e.target.checked) {
+                                    if (!newCustomerFlowState.data.selectedDialogueContexts.includes(value)) {
+                                        newCustomerFlowState.data.selectedDialogueContexts.push(value);
+                                    }
+                                } else {
+                                    newCustomerFlowState.data.selectedDialogueContexts = newCustomerFlowState.data.selectedDialogueContexts.filter(c => c !== value);
+                                }
+                            });
+                        });
+                    }
+                }
+            }
+
+            // Render functions for each step of the new customer creation flow
+            function renderNewCustomerStep1(data) {
+                return `
+                    <div class="form-group">
+                        <label for="new-customer-name">Customer's Base Name</label>
+                        <input type="text" id="new-customer-name" data-prop="baseName" value="${data.baseName}" placeholder="e.g., Quiet Quentin" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="new-customer-key">Unique Customer Key (UPPERCASE_SNAKE_CASE)</label>
+                        <input type="text" id="new-customer-key" data-prop="key" value="${data.key}" placeholder="e.g., NEW_ARCHETYPE" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="new-customer-avatar">Avatar Image URL (Optional)</label>
+                        <input type="text" id="new-customer-avatar" data-prop="avatarUrl" value="${data.avatarUrl}" placeholder="e.g., https://randomuser.me/api/portraits/men/99.jpg">
+                    </div>
+                `;
+            }
+            function validateNewCustomerStep1(data) {
+                if (!data.baseName.trim()) { alert('Base Name is required.'); return false; }
+                if (!data.key.trim()) { alert('Customer Key is required.'); return false; }
+
+                const formattedKey = data.key.trim().toUpperCase().replace(/[^A-Z0-9_]/g, ''); // Sanitize key
+                if (formattedKey !== data.key.trim().toUpperCase()) {
+                    alert('Customer Key should be in UPPERCASE_SNAKE_CASE format (A-Z, 0-9, underscores only). It has been auto-corrected. Please review.');
+                    newCustomerFlowState.data.key = formattedKey;
+                    renderNewCustomerFlow();
+                    return false;
+                }
+                if (appState.customers[formattedKey]) {
+                    alert(`Customer with key "${formattedKey}" already exists. Please choose a different key.`);
+                    return false;
+                }
+                newCustomerFlowState.data.key = formattedKey; // Ensure the sanitized key is used
+                return true;
+            }
+
+            function renderNewCustomerStep2(data) {
+                const createSelectOptions = (options, selectedValue) => options.map(opt =>
+                    `<option value="${opt}" ${opt === selectedValue ? 'selected' : ''}>${opt}</option>`
+                ).join('');
+
+                return `
+                    <div class="form-group">
+                        <label for="new-customer-mood">Initial Mood</label>
+                        <select id="new-customer-mood" data-prop="initialMood">
+                            ${createSelectOptions(CONFIG.moods, data.initialMood)}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Select Initial Dialogue Contexts (can be edited later)</label>
+                        <div class="checkbox-group">
+                            ${CONFIG.commonDialogueContexts.map(context => `
+                                <label>
+                                    <input type="checkbox" data-prop="selectedDialogueContexts" value="${context}" ${data.selectedDialogueContexts.includes(context) ? 'checked' : ''}>
+                                    ${context.replace(/([A-Z])/g, ' $1').trim()}
+                                </label>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+            function validateNewCustomerStep2(data) { return true; }
+
+            function renderNewCustomerStep3(data) {
+                return `
+                    <div class="form-group">
+                        <h3>Review your new customer archetype:</h3>
+                        <p><strong>Key:</strong> <code>${data.key}</code></p>
+                        <p><strong>Name:</strong> ${data.baseName}</p>
+                        <p><strong>Avatar:</strong> <img src="${data.avatarUrl || 'https://via.placeholder.com/50/555555/FFFFFF?text=NO+IMG'}" alt="Avatar" style="width:50px; height:50px; border-radius: 50%; vertical-align: middle; margin-left: 10px; border: 1px solid var(--border-color);"></p>
+                        <p><strong>Initial Mood:</strong> ${data.initialMood}</p>
+                        <p><strong>Initial Dialogue Contexts:</strong> ${data.selectedDialogueContexts.length > 0 ? data.selectedDialogueContexts.map(c => `<code>${c}</code>`).join(', ') : 'None'}</p>
+                        <p style="margin-top: 20px; font-weight: bold;">Click 'Create Customer' to finalize and open the editor for this new archetype.</p>
+                    </div>
+                `;
+            }
+            function validateNewCustomerStep3(data) { return true; }
+
+
+            // =================================================================
+            // 3. EVENT HANDLERS & LOGIC
+            // =================================================================
+
+            /**
+             * Toggles the visibility of the customer list menu.
+             */
+            function toggleMenu() {
+                appState.isMenuOpen = !appState.isMenuOpen;
+                body.classList.toggle('menu-open', appState.isMenuOpen);
+            }
+
+            /**
+             * Handles selection of a customer card from the menu.
+             * @param {string} key - The key of the selected customer.
+             */
+            function handleCustomerSelect(key) {
+                appState.activeCustomerKey = key;
+                appState.creatingNewCustomer = false;
+                toggleMenu(); // Close the menu after selection
+                renderMainContent();
+                renderCustomerList(); // Update highlight in the list
+            }
+
+            /**
+             * Initiates the "Create New Customer" flow.
+             */
+            function handleCreateCustomerClick() {
+                appState.activeCustomerKey = null;
+                appState.creatingNewCustomer = true;
+                newCustomerFlowState.step = 0;
+                newCustomerFlowState.data = {
+                    key: '', baseName: '', avatarUrl: '', initialMood: 'chill', selectedDialogueContexts: []
+                };
+                toggleMenu(); // Close the menu
+                renderMainContent(); // Show the first step of the new customer flow
+            }
+
+            /**
+             * Handles advancing to the next step in the new customer creation flow.
+             */
+            function handleNewCustomerFlowNext() {
+                const currentStep = NEW_CUSTOMER_FLOW_STEPS[newCustomerFlowState.step];
+                if (!currentStep.validate(newCustomerFlowState.data)) {
+                    return;
+                }
+
+                if (newCustomerFlowState.step < NEW_CUSTOMER_FLOW_STEPS.length - 1) {
+                    newCustomerFlowState.step++;
+                    renderNewCustomerFlow();
+                    editorTitle.textContent = `New Customer: Step ${newCustomerFlowState.step + 1} - ${NEW_CUSTOMER_FLOW_STEPS[newCustomerFlowState.step].title}`;
+                } else {
+                    const newKey = newCustomerFlowState.data.key;
+                    if (appState.customers[newKey]) { // Redundant check, but safe
+                        alert(`Error: Customer with key "${newKey}" already exists.`);
+                        return;
+                    }
+
+                    const newCustomer = {
+                        key: newKey,
+                        baseName: newCustomerFlowState.data.baseName,
+                        avatarUrl: newCustomerFlowState.data.avatarUrl || '',
+                        baseStats: {
+                            mood: newCustomerFlowState.data.initialMood,
+                            loyalty: 0, patience: 3, relationship: 0
+                        },
+                        dialogue: {}
+                    };
+                    newCustomerFlowState.data.selectedDialogueContexts.forEach(context => {
+                        newCustomer.dialogue[context] = [{
+                            conditions: [],
+                            lines: [`Default line for ${context}.`],
+                            payload: { type: "EFFECT", effects: [] }
+                        }];
+                    });
+
+                    appState.customers[newKey] = newCustomer;
+                    appState.activeCustomerKey = newKey;
+                    appState.creatingNewCustomer = false;
+
+                    alert('New customer archetype created successfully! Now loading in editor.');
+                    renderMainContent();
+                    renderCustomerList(); // Update the customer list with the new entry
+                }
+            }
+
+            /**
+             * Handles going back to the previous step in the new customer creation flow.
+             */
+            function handleNewCustomerFlowBack() {
+                if (newCustomerFlowState.step > 0) {
+                    newCustomerFlowState.step--;
+                    renderNewCustomerFlow();
+                    editorTitle.textContent = `New Customer: Step ${newCustomerFlowState.step + 1} - ${NEW_CUSTOMER_FLOW_STEPS[newCustomerFlowState.step].title}`;
+                }
+            }
+
+            /**
+             * Handles general input changes in the editor pane.
+             * @param {Event} event - The DOM change event.
+             */
+            function handleInputChange(event) {
+                const target = event.target;
+                const name = target.name;
+                if (!name || !appState.activeCustomerKey) return;
+
+                const customer = appState.customers[appState.activeCustomerKey];
+                let value = target.type === 'number' ? parseFloat(target.value) || 0 : target.value;
+
+                if (target.nodeName === 'TEXTAREA' && name.includes('.lines')) {
+                    value = target.value.split('\n').map(line => line.trim());
+                }
+
+                const keys = name.split('.');
+                let current = customer;
+                for (let i = 0; i < keys.length - 1; i++) {
+                    const keyPart = keys[i];
+                    if (!isNaN(parseInt(keys[i + 1])) && !Array.isArray(current[keyPart])) {
+                        current[keyPart] = current[keyPart] || [];
+                    } else if (typeof current[keyPart] !== 'object' || current[keyPart] === null) {
+                        current[keyPart] = {};
+                    }
+                    current = current[keyPart];
+                }
+                current[keys[keys.length - 1]] = value;
+
+                renderCustomerList();
+            }
+
+            /**
+             * Handles clicks on dynamic buttons within the editor (add/remove dialogue elements).
+             * @param {Event} event - The DOM click event.
+             */
+            function handleEditorMutation(event) {
+                event.stopPropagation();
+
+                const target = event.target;
+                const action = target.dataset.action;
+                if (!action || !appState.activeCustomerKey) return;
+
+                const customer = appState.customers[appState.activeCustomerKey];
+                const nodeKey = target.dataset.nodeKey;
+                const blockIndex = parseInt(target.dataset.blockIndex);
+                const condIndex = parseInt(target.dataset.condIndex);
+
+                switch (action) {
+                    case 'add-dialogue-node':
+                        let newNodeKey = prompt("Enter a unique key for the new dialogue context (e.g., rikkIsBroke, postTransaction):");
+                        if (newNodeKey) {
+                            newNodeKey = newNodeKey.trim();
+                            if (customer.dialogue[newNodeKey]) {
+                                alert("Error: Dialogue context already exists.");
+                                return;
+                            }
+                            customer.dialogue[newNodeKey] = [{
+                                conditions: [], lines: ["New dialogue line 1."], payload: { type: "EFFECT", effects: [] }
+                            }];
+                        }
+                        break;
+                    case 'remove-dialogue-node':
+                        if (confirm(`Are you sure you want to delete the "${nodeKey}" dialogue context for ${customer.baseName}?`)) {
+                            delete customer.dialogue[nodeKey];
+                        }
+                        break;
+                    case 'add-conditional-block':
+                        if (!customer.dialogue[nodeKey]) customer.dialogue[nodeKey] = [];
+                        customer.dialogue[nodeKey].push({
+                            conditions: [], lines: ["New conditional dialogue line 1."], payload: { type: "EFFECT", effects: [] }
+                        });
+                        break;
+                    case 'remove-conditional-block':
+                        if (confirm(`Are you sure you want to delete Conditional Block ${blockIndex + 1} from ${nodeKey} for ${customer.baseName}?`)) {
+                            customer.dialogue[nodeKey].splice(blockIndex, 1);
+                            if (customer.dialogue[nodeKey].length === 0) {
+                                delete customer.dialogue[nodeKey];
+                            }
+                        }
+                        break;
+                    case 'add-condition':
+                        customer.dialogue[nodeKey][blockIndex].conditions.push({ stat: 'mood', op: 'is', value: 'chill' });
+                        break;
+                    case 'remove-condition':
+                        customer.dialogue[nodeKey][blockIndex].conditions.splice(condIndex, 1);
+                        break;
+                    case 'delete-customer':
+                        if (confirm(`Are you sure you want to delete ${customer.baseName} (${customer.key})? This action cannot be undone and will remove them for this session.`)) {
+                            delete appState.customers[appState.activeCustomerKey];
+                            appState.activeCustomerKey = null;
+                            renderMainContent(); // Return to placeholder
+                            renderCustomerList(); // Update the list
+                        }
+                        return;
+                }
+                if (appState.activeCustomerKey) {
+                    renderCustomerEditor(appState.activeCustomerKey);
+                }
+            }
+
+            /**
+             * Attaches all event listeners for the editor pane (after each render).
+             */
+            function addEditorEventListeners() {
+                const oldEditorContentEl = document.getElementById('editor-content');
+                if (oldEditorContentEl) {
+                    oldEditorContentEl.removeEventListener('change', handleInputChange);
+                    oldEditorContentEl.removeEventListener('click', handleEditorMutation);
+                }
+                editorContentEl.addEventListener('change', handleInputChange);
+                editorContentEl.addEventListener('click', handleEditorMutation);
+            }
+
+            // =================================================================
+            // 4. INITIALIZATION
+            // =================================================================
+
+            function init() {
+                renderCustomerList();
+                renderMainContent(); // Initial render of the main content area (placeholder)
+
+                // Attach global event listeners
+                hamburgerMenuBtn.addEventListener('click', toggleMenu);
+                menuOverlay.addEventListener('click', toggleMenu); // Click overlay to close menu
+            }
+
+            init();
+        });
+    </script>
+</body>
+</html>

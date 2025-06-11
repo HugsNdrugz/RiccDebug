@@ -1,0 +1,152 @@
+:root {
+    /* Colors Palette (inspired by Material Design Dark Theme & One UI) */
+    --color-dark-bg: #121212; /* Very dark background, primary app background */
+    --color-surface: #1e1e1e; /* Slightly lighter than dark-bg, used for cards, panels, inputs */
+    --color-primary: #bb86fc; /* Main accent color, typically purple/magenta for MD */
+    --color-secondary: #03dac6; /* Secondary accent color, teal for MD */
+    --color-error: #cf6679; /* Color for error states, red/pink */
+    --color-on-surface: #e0e0e0; /* Text/icons color on dark backgrounds (surface, dark-bg) */
+    --color-on-primary: #000000; /* Text/icons color on primary accent color (should be dark) */
+    
+    /* Grayscale shades (for borders, muted text, disabled states) */
+    --color-mid-dark: #2c3e50; /* A dark grey, often used for borders or subtle dividers */
+    --color-grey-dark: #333333; /* Dark grey for borders or subtle UI elements */
+    --color-grey-mid: #757575; /* Medium grey for secondary text or inactive elements */
+    --color-grey-light: #bdbdbd; /* Light grey, for subtle borders or lighter text in dark themes */
+
+    /* Additional Accent Colors */
+    --color-accent-gold: #f39c12; /* Gold accent, for special highlights */
+    --color-accent-orange: #e67e22; /* Orange accent, for warnings or specific actions */
+    --color-link-blue: #3498db; /* Standard blue for links */
+    --color-success-green: #2ecc71; /* Green for success states */
+    --color-danger-red: var(--color-error); /* Alias for error color for semantic clarity */
+
+    /* Overlay Colors (for modals, dimmed backgrounds) */
+    --color-overlay-dark-strong: rgba(0, 0, 0, 0.9); /* Very dark, strong overlay */
+    --color-overlay-dark-medium: rgba(0, 0, 0, 0.65); /* Medium dark overlay */
+
+    /* Button Specific Colors */
+    --color-button-primary-bg: var(--color-primary);
+    --color-button-primary-text: var(--color-on-primary);
+    --color-button-primary-border: var(--color-primary);
+    --color-button-secondary-bg: transparent;
+    --color-button-secondary-text: var(--color-secondary);
+    --color-button-secondary-border: var(--color-secondary);
+    --color-disabled-bg: rgba(224, 224, 224, 0.12);
+    --color-disabled-border: rgba(224, 224, 224, 0.12);
+    --color-disabled-text: rgba(224, 224, 224, 0.38);
+
+    /* Chat Bubble Colors */
+    --color-bubble-customer: #3E3E42; /* Darker bubble for customer in dark theme */
+    --color-bubble-customer-text: var(--color-on-surface);
+    --color-bubble-rikk-main: var(--color-primary);
+    --color-bubble-rikk-text: var(--color-on-primary);
+    --color-bubble-narration: transparent;
+    --color-bubble-narration-text: var(--color-grey-mid);
+
+    /* HUD Action Button Colors */
+    --color-hub-action-main: var(--color-secondary);
+    --color-hub-action-hover: #018786;
+    --color-hub-inventory-main: var(--color-primary);
+    --color-hub-inventory-hover: #7f39fb;
+
+    /* NEW UI-SPECIFIC VARS (for One UI phone and general components) */
+    --primary-accent: #e040fb; /* A vibrant magenta/purple for primary actions */
+    --alert-color: #f44336; /* Bright red for alerts/warnings */
+    --ui-bg: rgba(25, 25, 25, 0.6); /* Semi-transparent dark background for UI elements */
+    --border-light: rgba(255, 255, 255, 0.2); /* Light transparent border */
+    --text-primary: #f0f0f0; /* Primary text color for new UI elements */
+    --text-secondary: #a0a0a0; /* Secondary/muted text color for new UI elements */
+    --divider-color: var(--border-light); /* Common divider color */
+    --active-card-bg: #2a2a2e; /* Background for active/selected cards */
+
+    /* --- Phone Theming Variables (for different phone themes) --- */
+    /* These variables will be dynamically changed by UIManager based on selected theme (default, dark, light) */
+    --phone-bg-color: #111; /* Default phone device background */
+    --phone-on-bg-color: #e0e0e0; /* Default text color on phone background */
+    /* Defaulting based on the base theme, will be overridden by .theme-dark, .theme-light on #rikk-phone-ui */
+
+    /* --- Fonts --- */
+    --font-body: 'Roboto', 'Open Sans', sans-serif; /* Main text font */
+    --font-display: 'Press Start 2P', 'Comic Neue', cursive; /* Display/Title font */
+    /* Add other fonts if used, e.g., for One UI specific text or game elements */
+    --font-inter: 'Inter', sans-serif; /* For new UI elements that use Inter */
+    --font-black-ops-one: 'Black Ops One', sans-serif; /* For Slot Game title */
+
+    /* --- Sizes & Dimensions --- */
+    --viewport-max-width: 480px; /* Maximum width of the entire game viewport */
+    --viewport-border-radius: 12px; /* Border radius for the game viewport */
+    --phone-max-width: 320px; /* Max width of the phone device itself */
+    --phone-max-height: 70vh; /* Max height of the phone device (relative to viewport height) */
+    --phone-border-radius: 28px; /* Outer border radius of the phone device */
+    --phone-screen-inset-radius: calc(var(--phone-border-radius) - 10px); /* Inner screen border radius */
+    --modal-max-width: 420px; /* Max width for general modals */
+    --modal-border-radius: 10px; /* Border radius for general modals */
+    --button-border-radius: 8px; /* Default border radius for buttons */
+    --chat-bubble-border-radius: 18px; /* Rounded corners for chat bubbles */
+    --icon-size: 22px; /* Default size for general icons */
+
+    /* --- Spacing Units --- */
+    --spacing-unit: 8px; /* Base spacing unit, all other spacing is derived from this */
+    --spacing-xs: calc(var(--spacing-unit) * 0.5); /* 4px */
+    --spacing-sm: var(--spacing-unit); /* 8px */
+    --spacing-md: calc(var(--spacing-unit) * 1.5); /* 12px */
+    --spacing-lg: calc(var(--spacing-unit) * 2); /* 16px */
+    --spacing-xl: calc(var(--spacing-unit) * 3); /* 24px */
+
+    /* --- Transitions & Animations --- */
+    --transition-duration-short: 0.2s;
+    --transition-duration-medium: 0.4s;
+    --transition-easing: ease-in-out;
+    --transition-phone-slide: 0.5s cubic-bezier(0.16, 1, 0.3, 1); /* Custom easing for phone slide animation */
+
+    /* --- Clock Widget Variables (now using these global vars) --- */
+    --widget-clock-time-font-size: 48px;
+    --widget-clock-date-font-size: 14px;
+    --widget-clock-text-color: white;
+    --widget-clock-text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    --widget-clock-bg-color: transparent;
+    --widget-clock-padding: 0;
+    --widget-clock-margin-top: 40px;
+}
+
+/* --- Dark Mode Theme Overrides --- */
+/* This is an example of how dark mode can be implemented using a class on :root or body.
+   For the phone, it's now applied directly to #rikk-phone-ui by UIManager.
+   For the main game UI, you might apply .theme-dark to #game-viewport.
+*/
+.theme-dark {
+    /* Example overrides for main UI elements if applied globally */
+    /* --color-surface: #2c2c2c; */
+    /* --text-primary: #ffffff; */
+    /* --text-secondary: #bbbbbb; */
+    /* --divider-color: #444; */
+}
+
+/* Specific theme for the phone, applied via JS */
+#rikk-phone-ui.theme-dark {
+    --phone-bg-color: #000;
+    --phone-on-bg-color: #e0e0e0;
+    --color-surface: #2c2c2c; /* Overrides for elements within phone */
+    --text-primary: #ffffff;
+    --text-secondary: #bbbbbb;
+    --divider-color: #444;
+    --active-card-bg: #3a3a3e;
+    --color-bubble-customer: #4a4a4e; /* Darker bubble for customer in dark theme */
+    --color-button-secondary-text: var(--color-secondary); /* Ensure secondary buttons are visible */
+}
+
+#rikk-phone-ui.theme-light {
+    --phone-bg-color: #f0f0f0;
+    --phone-on-bg-color: #111;
+    --color-surface: #ffffff; /* Lighter surface for elements within phone */
+    --text-primary: #111111;
+    --text-secondary: #555555;
+    --divider-color: #e0e0e0;
+    --active-card-bg: #f8f8f8;
+    --color-bubble-customer: #e0e0e0; /* Lighter bubble for customer in light theme */
+    --color-bubble-customer-text: #111111;
+    --color-button-primary-bg: var(--color-primary); /* Primary button still vibrant */
+    --color-button-primary-text: var(--color-on-primary);
+    --color-button-secondary-text: var(--color-primary); /* Secondary buttons use primary accent */
+}

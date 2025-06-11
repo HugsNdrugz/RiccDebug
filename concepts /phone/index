@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8">
+  <title>android</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1"><title>cellphone</title><meta charset="UTF-8"><link rel="stylesheet" href="./style.css">
+
+</head>
+<body>
+<!-- partial:index.partial.html -->
+<script src="https://cdn.tailwindcss.com"></script>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<body class="flex items-center justify-center min-h-screen bg-gray-100">
+  <div class="phone-body">
+    <div class="volume-btn"></div>
+    <div class="power-btn"></div>
+    <div class="screen">
+      <div class="wallpaper"></div>
+      <div class="notch">
+        <div class="camera"></div>
+        <div class="speaker"></div>
+      </div>
+
+      <div class="status-bar">
+        <div id="current-time-small">12:34</div>
+        <div class="status-icons">
+          <i class="fas fa-signal"></i>
+          <i class="fas fa-wifi"></i>
+          <i class="fas fa-battery-three-quarters"></i>
+        </div>
+      </div>
+
+      <div class="time-display" id="current-time">00:00</div>
+      <div class="date-display" id="current-date">Monday, January 1</div>
+
+      <div class="notification" id="notification">
+        <div class="notification-content"><a href="https://codepen.io/sudo-self/pen/qEEVXKp">Codepen.io</a></div>
+      </div>
+
+      <div class="app-grid">
+        <div class="app-icon" onclick="showNotification()">
+          <i class="fas fa-envelope"></i>
+          <div class="app-label">Messages</div>
+        </div>
+        <div class="app-icon">
+          <i class="fas fa-camera"></i>
+          <div class="app-label">Camera</div>
+        </div>
+        <div class="app-icon">
+          <i class="fas fa-music"></i>
+          <div class="app-label">Music</div>
+        </div>
+        <div class="app-icon">
+          <i class="fas fa-map-marker-alt"></i>
+          <div class="app-label">Maps</div>
+        </div>
+        <div class="app-icon">
+          <i class="fas fa-calendar"></i>
+          <div class="app-label">Calendar</div>
+        </div>
+        <div class="app-icon">
+          <i class="fas fa-clock"></i>
+          <div class="app-label">Clock</div>
+        </div>
+        <div class="app-icon">
+          <i class="fas fa-calculator"></i>
+          <div class="app-label">Calculator</div>
+        </div>
+        <div class="app-icon">
+          <i class="fas fa-cloud-sun"></i>
+          <div class="app-label">Weather</div>
+        </div>
+        <div class="app-icon">
+          <i class="fas fa-photo-video"></i>
+          <div class="app-label">Photos</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="dock">
+      <div class="dock-icon"><i class="fas fa-phone"></i></div>
+      <div class="dock-icon"><i class="fas fa-comment"></i></div>
+      <div class="dock-icon"><i class="fas fa-user"></i></div>
+      <div class="dock-icon"><i class="fas fa-compass"></i></div>
+    </div>
+
+    <div class="home-indicator"></div>
+
+    <p style="border-radius: 8px; text-align: center; font-size: 12px; color: #fff; margin-top: 16px; position: fixed; left: 8px; bottom: 8px; z-index: 10; background: rgba(0, 0, 0, 0.8); padding: 6px 12px; max-width: 90%; width: fit-content; font-family: sans-serif;">
+      Made with &#10084;&nbsp;
+      <a href="https://sudo-self.github.io/iphone" target="_blank" style="color: #fff; text-decoration: underline; transition: color 0.2s ease;">sudo-self</a>
+    </p>
+<!-- partial -->
+  <script  src="./script.js"></script>
+
+</body>
+</html>

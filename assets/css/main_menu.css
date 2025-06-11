@@ -1,0 +1,210 @@
+/* === REVISED MAIN MENU STYLES === */
+#main-menu-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    padding: var(--spacing-xl);
+    text-align: center;
+    position: relative;
+    z-index: 10; /* Ensure content is above background lights */
+}
+
+/* Settings Cog Button */
+#start-screen #settings-menu-btn {
+    position: absolute;
+    bottom: 0px;
+    right: 0px;
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 1rem;
+    cursor: pointer;
+    z-index: 10;
+    transition: color 0.2s ease, transform 0.3s ease;
+    padding: 0px;
+}
+
+#start-screen #settings-menu-btn:hover {
+    color: #fff;
+    transform: rotate(45deg);
+}
+
+/* === SPLIT BUTTON MAIN MENU STYLES === */
+/* This component combines a main action button with a smaller icon button. */
+.split-button-container {
+    display: flex;
+    align-items: center; /* For aligning items within the container if they have different heights */
+    gap: 8px; /* Spacing between the two buttons */
+    font-family: var(--font-inter); /* Using the Inter font variable */
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+}
+
+.split-button-container .btn {
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    justify-content: center; /* Center content horizontally */
+    align-items: center; /* Center content vertically */
+    font-weight: 700; /* Bold text */
+    user-select: none; /* Prevent text selection */
+    transition: background-color 0.3s ease, transform 0.1s ease;
+    
+    /* Using colors from the general theme variables */
+    background-color: var(--color-primary);
+    color: var(--color-on-primary); /* Text color that contrasts with primary */
+}
+
+.split-button-container .btn-main {
+    padding:  20px 24px; /* Adjusted padding for better visual balance */
+    font-size: 1.2rem;
+    font-family: var(--font-display); /* Use the display font for main button text */
+    border-radius: 50px; /* Highly rounded, pill shape */
+}
+
+.split-button-container .btn-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%; /* Perfect circle */
+    flex-shrink: 0; /* Prevents it from shrinking in flex container */
+    font-size: 1.2rem; /* Icon size */
+}
+
+/* Hover effect for the entire split button container */
+.split-button-container:hover .btn {
+    background-color: var(--color-secondary); /* Change to secondary accent color on hover */
+    color: var(--color-on-surface); /* Adjust text color for secondary accent */
+}
+
+.split-button-container .btn:active {
+    transform: scale(0.97); /* Slight scale down on click for feedback */
+}
+
+
+/* === Sub-Menu Panel Styles === */
+/* These panels appear over the main menu for settings, load game, etc. */
+.submenu-panel {
+    background-color: var(--color-surface); /* Use theme surface color */
+    padding: var(--spacing-xl);
+    border-radius: var(--modal-border-radius);
+    border: 1px solid var(--color-grey-dark);
+    position: absolute; /* Position over the main menu content */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* Center the panel */
+    width: 90%;
+    max-width: 450px;
+    z-index: 1010; /* Higher z-index to overlay main menu and phone */
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.5);
+    color: var(--color-on-surface); /* Text color for content on panel */
+}
+
+.submenu-panel h2 {
+    font-family: var(--font-display);
+    color: var(--color-primary);
+    text-align: center;
+    margin-bottom: var(--spacing-lg);
+    font-size: 1.8rem;
+}
+
+.submenu-panel p {
+    text-align: center;
+    margin-bottom: var(--spacing-md);
+    line-height: 1.6;
+}
+
+.submenu-back-btn {
+    padding: var(--spacing-sm) var(--spacing-lg);
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    font-weight: bold;
+    background-color: var(--color-grey-dark); /* Dark grey background */
+    color: var(--color-on-surface); /* Light text */
+    border: 1px solid var(--color-grey-mid); /* Medium grey border */
+    border-radius: var(--button-border-radius);
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s;
+    display: block; /* Make it a block element to take full width */
+    margin: var(--spacing-xl) auto 0; /* Center horizontally with top margin */
+    min-width: 150px;
+    text-align: center;
+}
+
+.submenu-back-btn:hover {
+    background-color: var(--color-grey-mid);
+    border-color: var(--color-grey-light);
+}
+
+/* === MAIN MENU LIGHT EFFECT === */
+/* These are background visual effects for the main menu screen. */
+#start-screen .light-container {
+    position: absolute; 
+    inset: 0; /* top, right, bottom, left = 0, to cover the entire container */
+    width: 100%;
+    height: 100%;
+    z-index: 0; /* Sit behind the menu content but over the background image */
+    overflow: hidden;
+    background-color: rgba(0, 0, 0, 0); /* Transparent dark overlay for the lights to show through */
+
+    /* Controlled by JS to fade in/out */
+    opacity: 0;
+    transition: opacity 0.8s ease-in-out;
+}
+
+#start-screen .light-container.lights-active {
+    opacity: 1; /* Fully visible when active */
+}
+
+#start-screen .light {
+    position: absolute;
+    top: 10px;
+    left: -10px;
+    width: 150%; /* Larger than container to ensure full coverage on blur */
+    height: 150%;
+    opacity: 0; /* Hidden by default */
+    will-change: opacity; /* Optimize for animation */
+}
+
+#start-screen .left-bank {
+    background: radial-gradient(circle at 25% 50%, rgba(255, 0, 0, 0.7), transparent 50%); /* Red glow */
+    filter: blur(40px);
+    animation: left-side-flash 1s infinite;
+}
+
+#start-screen .right-bank {
+    background: radial-gradient(circle at 75% 50%, rgba(0, 80, 255, 0.7), transparent 50%); /* Blue glow */
+    filter: blur(40px);
+    animation: right-side-flash 1s infinite;
+}
+
+#start-screen .left-strobe {
+    background: radial-gradient(circle at 25% 50%, #ff5050, transparent 25%); /* Brighter red strobe */
+    filter: blur(5px);
+    animation: left-side-flash 1s infinite;
+}
+
+#start-screen .right-strobe {
+    background: radial-gradient(circle at 75% 50%, #50a0ff, transparent 25%); /* Brighter blue strobe */
+    filter: blur(5px);
+    animation: right-side-flash 1s infinite;
+}
+
+@keyframes left-side-flash {
+    0% { opacity: 1; }
+    10% { opacity: 0; }
+    20% { opacity: 1; }
+    30%, 100% { opacity: 0; } /* Stays off for the rest of the cycle */
+}
+
+@keyframes right-side-flash {
+    0%, 49.9% { opacity: 0; } /* Stays off for first half of the cycle */
+    50% { opacity: 1; }
+    60% { opacity: 0; }
+    70% { opacity: 1; }
+    80%, 100% { opacity: 0; } /* Stays off for the rest of the cycle */
+}

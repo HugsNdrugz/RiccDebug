@@ -1,0 +1,317 @@
+/* --- Core Theming & Variables (Moved to variables.css) --- */
+/* The :root and .theme-dark variables, and generic *{} and body/html rules
+   from the original style.css are now either in `variables.css` or `base.css`.
+   This `style.css` focuses on global components and structures that are NOT
+   covered by the new, more specific CSS files like `one_ui_phone.css` or `apps.css`.
+*/
+
+/* Reset some default browser behaviors */
+* {
+  box-sizing: border-box;
+  /* Font color inherited from base.css or main theming variables */
+}
+input:focus,
+select:focus,
+textarea:focus,
+button:focus {
+  outline: none; /* Remove default focus outlines */
+}
+button:focus {
+  outline: 0; /* Redundant but harmless, ensures no residual focus */
+}
+
+/* --- Toggle Switch Styles (General UI Component, not phone-specific anymore) --- */
+.toggleWrapper input.mobileToggle {
+  opacity: 0; /* Hide the actual checkbox */
+  position: absolute;
+}
+.toggleWrapper input.mobileToggle + label {
+  position: relative;
+  display: inline-block;
+  user-select: none;
+  -moz-transition: 0.4s ease;
+  -o-transition: 0.4s ease;
+  -webkit-transition: 0.4s ease;
+  transition: 0.4s ease;
+  -webkit-tap-highlight-color: transparent; /* Remove tap highlight on mobile */
+  height: 30px;
+  width: 50px;
+  border: 1px solid var(--divider-color); /* Use theme variable for border */
+  border-radius: 60px; /* Pill shape */
+  cursor: pointer;
+}
+.toggleWrapper input.mobileToggle + label:before {
+  content: "";
+  position: absolute;
+  display: block;
+  -moz-transition: 0.2s cubic-bezier(0.24, 0, 0.5, 1);
+  -o-transition: 0.2s cubic-bezier(0.24, 0, 0.5, 1);
+  -webkit-transition: 0.2s cubic-bezier(0.24, 0, 0.5, 1);
+  transition: 0.2s cubic-bezier(0.24, 0, 0.5, 1);
+  height: 30px;
+  width: 51px;
+  top: 0;
+  left: 0;
+  border-radius: 30px;
+}
+.toggleWrapper input.mobileToggle + label:after {
+  content: "";
+  position: absolute;
+  display: block;
+  box-shadow: 0 0 0 1px hsla(0, 0%, 0%, 0.1), 0 4px 0px 0 hsla(0, 0%, 0%, 0.04), 0 4px 9px hsla(0, 0%, 0%, 0.13), 0 3px 3px hsla(0, 0%, 0%, 0.05);
+  -moz-transition: 0.35s cubic-bezier(0.54, 1.6, 0.5, 1);
+  -o-transition: 0.35s cubic-bezier(0.54, 1.6, 0.5, 1);
+  -webkit-transition: 0.35s cubic-bezier(0.54, 1.6, 0.5, 1);
+  transition: 0.35s cubic-bezier(0.54, 1.6, 0.5, 1);
+  background: var(--card-bg-color); /* Use theme variable for switch knob color */
+  height: 28px;
+  width: 28px;
+  top: 1px;
+  left: 0px;
+  border-radius: 60px;
+}
+.toggleWrapper input.mobileToggle:checked + label:before {
+  background: var(--accent-color-green); /* Use theme variable for active track color */
+  -moz-transition: width 0.2s cubic-bezier(0, 0, 0, 0.1);
+  -o-transition: width 0.2s cubic-bezier(0, 0, 0, 0.1);
+  -webkit-transition: width 0.2s cubic-bezier(0, 0, 0, 0.1);
+  transition: width 0.2s cubic-bezier(0, 0, 0, 0.1);
+}
+.toggleWrapper input.mobileToggle:checked + label:after {
+  left: 24px; /* Move knob to the right when checked */
+}
+
+/* --- Standardized Text Input Styles (General UI Component) --- */
+/* These styles are for general text inputs across the application, not just phone apps */
+.oneui-text-input,
+input[type="text"].oneui-text-input-direct, 
+input[type="tel"].oneui-text-input-direct,
+textarea.oneui-text-input-direct {
+  width: 100%; 
+  background-color: var(--surface-bg-color); /* Use theme variable for input background */
+  border: 1px solid var(--divider-color);
+  border-radius: 8px;
+  padding: 12px 10px;
+  font-size: 1rem;
+  color: var(--text-color-primary);
+  transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  -webkit-appearance: none; 
+  -moz-appearance: none;    
+  appearance: none;        
+}
+
+.oneui-text-input:focus,
+input[type="text"].oneui-text-input-direct:focus,
+input[type="tel"].oneui-text-input-direct:focus,
+textarea.oneui-text-input-direct:focus {
+  border-color: var(--accent-color-blue); /* Accent color on focus */
+  box-shadow: 0 0 0 2px rgba(var(--accent-color-blue-rgb), 0.2); /* Subtle glow on focus */
+}
+
+/* Textarea specific styles */
+textarea.oneui-text-input,
+textarea.oneui-text-input-direct {
+  min-height: 80px; 
+  line-height: 1.4; 
+  resize: vertical; /* Allow vertical resizing */
+}
+/* End Standardized Text Input Styles */
+
+/* --- Standardized Button Styles (General UI Component) --- */
+/* These styles are for general buttons across the application, not just phone apps */
+.oneui-button { 
+  padding: 10px 16px;
+  border-radius: 20px; 
+  font-size: 0.9rem;
+  font-weight: 500; 
+  border: none;
+  text-align: center;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out, filter 0.2s ease-in-out;
+  display: inline-flex; 
+  align-items: center;
+  justify-content: center;
+  gap: 8px; 
+  min-height: 40px; 
+}
+
+.oneui-button-primary {
+  background-color: var(--accent-color-blue);
+  color: var(--text-color-on-accent);
+}
+.oneui-button-primary:hover {
+  filter: brightness(90%);
+}
+.oneui-button-primary:active {
+  filter: brightness(80%);
+}
+
+/* Variant for green primary button */
+.oneui-button-primary.green {
+  background-color: var(--accent-color-green);
+  color: var(--text-color-on-accent);
+}
+.oneui-button-primary.green:hover {
+  background-color: var(--accent-color-green-darker); 
+  filter: none; 
+}
+.oneui-button-primary.green:active {
+  filter: brightness(80%); 
+}
+
+/* Text-only button variant */
+.oneui-button-text {
+  background-color: transparent;
+  color: var(--accent-color-blue);
+}
+.oneui-button-text:hover {
+  background-color: rgba(var(--accent-color-blue-rgb), 0.1);
+}
+.oneui-button-text:active {
+  background-color: rgba(var(--accent-color-blue-rgb), 0.2);
+}
+/* End Standardized Button Styles */
+
+/* --- In-App Header Back Button (General UI Component, used across apps) --- */
+.oneui-header-back-button {
+  position: absolute;
+  left: 16px; 
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 11; 
+  font-size: 1.5rem; 
+  color: var(--text-color-primary);
+  cursor: pointer;
+  padding: 8px; 
+  margin-left: -8px; 
+  border-radius: 50%; 
+  transition: background-color 0.2s ease-in-out, opacity 0.2s ease-in-out;
+}
+
+.oneui-header-back-button:hover {
+  background-color: rgba(var(--text-color-primary-rgb), 0.08);
+}
+
+.oneui-header-back-button:active {
+  background-color: rgba(var(--text-color-primary-rgb), 0.12);
+}
+/* End In-App Header Back Button */
+
+/* --- App Wrapper (Background) (This is the outermost container for the whole game, not just the phone) --- */
+/* The phone itself is now nested within #game-scene and has its own styling in one_ui_phone.css */
+.app-wrapper {
+  background-image: url("http://static1.gamespot.com/uploads/original/1179/11799911/2718166-rsg_gtav_ng_screenshot_006.jpg"); /* Original background image */
+  height: 100%;
+  background-size: cover;
+  background-repeat: no-repeat;
+  display: flex; /* Make it a flex container to center its child (game-viewport) */
+  align-items: center; /* Center vertically */
+  justify-content: center; /* Center horizontally */
+}
+
+/* --- Phone Wrapper (Device Frame) and Phone Screen (Inner Display) --- */
+/* These styles are moved to `one_ui_phone.css` as they are now specific to the new phone design.
+   Original selectors like `.app-wrapper .phone-wrapper` are no longer used here.
+*/
+
+/* --- NEW: Launcher Styles (Home Screen) --- */
+/* These styles are now in `one_ui_phone.css` */
+
+/* --- NEW: Clock Widget (General Component, potentially used elsewhere but primarily launcher) --- */
+.clock-widget {
+  color: var(--widget-clock-text-color);
+  text-align: center;
+  margin-top: var(--widget-clock-margin-top);
+  text-shadow: var(--widget-clock-text-shadow);
+  background-color: var(--widget-clock-bg-color);
+  padding: var(--widget-clock-padding);
+}
+.clock-widget .time {
+  font-size: var(--widget-clock-time-font-size); 
+  font-weight: 300;
+  margin-bottom: 5px;
+}
+.clock-widget .date {
+  font-size: var(--widget-clock-date-font-size);
+  font-weight: 400;
+}
+
+/* --- NEW: App Grid & Icons (Moved to one_ui_phone.css and apps.css) --- */
+/* Drag and Drop helper classes */
+.drag-image-clone {
+    position: absolute;
+    top: -9999px; /* Position off-screen */
+    left: -9999px;
+    pointer-events: none; /* Ensure it doesn't interfere with mouse events */
+    z-index: 1000; /* Ensure it's on top if briefly visible */
+    /* Copy crucial styles from .app-icon if not captured by cloneNode(true) perfectly */
+    background-color: inherit; 
+}
+
+.app-icon-placeholder {
+    border: 2px dashed #999 !important; /* Distinct border */
+    background-color: rgba(200, 200, 200, 0.15) !important; /* Semi-transparent background */
+    box-shadow: none !important; /* Remove any box shadow from .app-icon */
+}
+/* Hide actual icon/label content if the placeholder is based on cloning an app-icon element */
+.app-icon-placeholder .material-icons,
+.app-icon-placeholder .app-icon-label {
+    display: none !important;
+}
+
+.app-icon[draggable="true"] {
+    cursor: grab;
+}
+.app-icon.dragging {
+    opacity: 0 !important; /* Hide it */
+}
+.app-icon.drag-over {
+    border: 2px dashed #fff; 
+    transform: scale(1.1);
+}
+
+/* --- REFACTORED: App View Common Styles (All slide-up apps) --- */
+/* These styles are moved to `one_ui_phone.css` as they are general to app views within the phone. */
+
+/* --- NEW: One UI Expandable Header (App Bar) --- */
+/* These styles are moved to `one_ui_phone.css` and `apps.css` */
+
+/* --- Content Area that scrolls under the header --- */
+/* These styles are moved to `one_ui_phone.css` */
+
+/* --- One UI Focus Blocks / Cards (List Items) --- */
+/* These styles are largely moved to `apps.css` for app-specific contexts */
+
+/* --- One UI Dialog (Confirmation) --- */
+/* These styles are largely moved to `apps.css` for app-specific contexts */
+
+/* --- Android Nav Bar --- */
+/* These styles are moved to `one_ui_phone.css` */
+
+/* --- Specific App Styles (Original, now largely obsolete or moved to apps.css) --- */
+/* The following app-specific styles from the original project's style.css are largely deprecated
+   or have been replaced by the new modular approach in `apps.css` and the new app managers.
+   They are commented out or removed if they are directly conflicting or no longer relevant.
+   Any specific styling for these apps would now live within `apps.css` under their specific #app-view-id
+   or related components.
+*/
+
+/* Example of how old app-specific styles are now managed:
+   Original: `.app-wrapper .phone-wrapper .screen .call-wrapper { background: var(--bg-color); }`
+   New approach: `apps.css` would have `#call-app-view { background-color: var(--color-dark-bg); }`
+   The content and logic for 'call', 'services', 'twitter', 'life-alert', 'loading' apps are
+   NO LONGER PRESENT in `index.html` as they were part of the AngularJS structure.
+   If these apps are desired, they would need to be rebuilt as separate vanilla JS modules
+   and integrated into the new phone system.
+*/
+
+/* Removed most old app-specific styles as they are no longer relevant or handled by new modules */
+
+/* --- Error Toast --- */
+/* This is moved to `one_ui_phone.css` */
+
+/* --- Responsive & Other styles --- */
+/* Some responsive rules may be moved to `one_ui_phone.css` if they apply to the phone itself. */
+
+/* Keyframe Animations are handled globally in base.css or locally if unique */
+/* The original spinner-animation and greenPulse are not currently used in the new phone structure's HTML */

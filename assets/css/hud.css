@@ -1,0 +1,119 @@
+/* === NEW SLEEK UI STYLES === */
+/* This section styles the top and bottom navigation bars of the main game screen, outside the phone. */
+
+/* Game Header (Top Bar with Stats) */
+.game-header {
+    padding: 10px 10px 0; /* Padding at top, sides, and no bottom padding (for event ticker below) */
+    font-family: var(--font-inter); /* Use the Inter font variable for modern look */
+    flex-shrink: 0; /* Prevents header from shrinking in a flex container */
+}
+
+.game-header .status-bar {
+    display: flex; /* Use flexbox for horizontal alignment of status items */
+    justify-content: space-around; /* Distribute items evenly with space around them */
+    align-items: center; /* Vertically align items in the middle */
+    padding: 10px;
+    margin: 10px 5px; /* Margin from the edges of the viewport */
+    background: var(--ui-bg); /* Semi-transparent background using UI variable */
+    backdrop-filter: blur(12px); /* Frosted glass effect */
+    -webkit-backdrop-filter: blur(12px); /* Safari compatibility */
+    border-radius: 18px; /* Rounded corners for the status bar container */
+    border: 1px solid var(--border-light); /* Light, transparent border */
+}
+
+.status-item {
+    display: flex; /* Use flexbox for icon and text within each status item */
+    align-items: center; /* Vertically align icon and text */
+    gap: 8px; /* Space between icon and text */
+    font-size: 1rem;
+    font-weight: 500; /* Medium font weight */
+    color: var(--text-primary); /* Primary text color for HUD stats */
+}
+
+.status-item svg {
+    opacity: 0.8; /* Slightly muted color for icons */
+}
+
+/* Rival Banner / Event Ticker */
+.rival-banner {
+    background-color: var(--alert-color); /* Red for alerts */
+    color: white; /* White text on red background */
+    text-align: center;
+    padding: 6px;
+    margin: 12px 5px 0; /* Margin below status bar, with side margins */
+    border-radius: 10px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 10px rgba(244, 67, 54, 0.4); /* Subtle shadow matching alert color */
+}
+
+/* Main Content Area (Game Scene) */
+.main-content { 
+    flex-grow: 1; /* This makes the game-scene area fill available space between header and footer */
+}
+
+/* Bottom Navigation Bar (Game Actions) */
+.bottom-nav {
+    display: flex; /* Use flexbox for horizontal alignment of buttons */
+    gap: 12px; /* Space between navigation buttons */
+    padding: 15px;
+    padding-bottom: 25px; /* Extra padding for home bar area on phones to match real device feel */
+    font-family: var(--font-inter);
+    flex-shrink: 0; /* Prevents navigation bar from shrinking */
+}
+
+.nav-button {
+    flex: 1; /* Each button takes up equal space */
+    padding: 16px;
+    border: 1px solid var(--border-light);
+    border-radius: 18px; /* Rounded corners for buttons */
+    background: var(--ui-bg); /* Semi-transparent background */
+    backdrop-filter: blur(12px); /* Frosted glass effect */
+    -webkit-backdrop-filter: blur(12px); /* Safari compatibility */
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    cursor: pointer;
+    display: flex; /* Use flexbox for icon and text inside button */
+    align-items: center;
+    justify-content: center;
+    gap: 8px; /* Space between icon and text */
+    transition: all 0.2s ease-out; /* Smooth transitions for hover/active states */
+}
+
+.nav-button:hover {
+    transform: translateY(-4px); /* Slight lift effect on hover */
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3); /* Larger shadow on hover */
+    border-color: rgba(255, 255, 255, 0.4); /* Slightly stronger border on hover */
+}
+
+.nav-button:active {
+    transform: translateY(-1px); /* Slight press effect on click */
+    background: rgba(40, 40, 40, 0.7); /* Darker background on active */
+}
+
+.nav-button:disabled {
+    opacity: 0.5; /* Muted appearance when disabled */
+    cursor: not-allowed; /* Change cursor for disabled state */
+    transform: none; /* No lift/press effect */
+    box-shadow: none; /* No shadow */
+    background: rgba(40, 40, 40, 0.5); /* Slightly darker disabled background */
+}
+
+.nav-button .capacity {
+    color: var(--text-secondary); /* Secondary text color for capacity info */
+    font-weight: 500;
+}
+
+.nav-button--primary {
+    background: var(--primary-accent); /* Use primary accent color for primary button */
+    border: none;
+    box-shadow: 0 4px 20px -5px var(--primary-accent); /* Shadow matching accent color */
+}
+
+.nav-button--primary:hover:not(:disabled) {
+    background: #f55cff; /* Slightly brighter magenta on hover */
+    box-shadow: 0 6px 25px -5px var(--primary-accent); /* Larger shadow on hover */
+}

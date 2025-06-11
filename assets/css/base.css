@@ -1,0 +1,26 @@
+/* Base Styles & Reset */
+* {
+    box-sizing: border-box; /* Ensures padding and border are included in the element's total width and height */
+    margin: 0; /* Remove default margins from all elements */
+    padding: 0; /* Remove default padding from all elements */
+}
+
+/* Global body and html styling */
+body {
+    font-family: var(--font-body); /* Use a global CSS variable for the main body font */
+    background-color: #000000; /* Solid black background for the entire game viewport */
+    color: var(--color-on-surface); /* Use a global CSS variable for primary text color on main surfaces */
+    min-height: 100vh; /* Ensure the body takes at least the full height of the viewport */
+    display: flex; /* Use flexbox to center the game viewport */
+    justify-content: center; /* Center horizontally */
+    align-items: center; /* Center vertically */
+    overflow: hidden; /* Hide any overflow, keeping the game strictly within its bounds */
+    padding: var(--spacing-sm); /* Small padding around the game viewport */
+}
+
+/* Keyframes for a generic spinning animation, used by loaders */
+@keyframes spin {
+    to {
+        transform: rotate(360deg); /* Rotates element 360 degrees */
+    }
+}
